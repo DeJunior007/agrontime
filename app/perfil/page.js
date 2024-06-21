@@ -1,53 +1,55 @@
-"use client";
-import React, { useState, useEffect } from "react";
-import { z } from "zod";
-import Swal from "sweetalert2";
-import Navbar from "../components/Navbar";
-import InputMask from "react-input-mask";
+'use client';
+import React, { useState, useEffect } from 'react';
+import { z } from 'zod';
+import Swal from 'sweetalert2';
+import Navbar from '../components/Navbar';
+import InputMask from 'react-input-mask';
 import {
   getJWTFromCookie,
   buscarUsuarioPorEmail,
   atualizarUsuario,
   deletarUsuario,
-} from "../api/perfilApi";
+} from '../api/perfilApi';
 
 const usuarioSchema = z.object({
   idUsuario: z.number().optional(),
-  nomeCompleto: z.string().nonempty("Nome Completo é obrigatório"),
-  documentoFiscal: z.string().nonempty("CPF é obrigatório"),
-  email: z.string().email("E-mail inválido").nonempty("E-mail é obrigatório"),
-  senha: z.string().min(4, "Senha deve ter no mínimo 4 caracteres"),
-  tipo: z.enum(["Proprietário", "Agrônomo", "Técnico Agrícola"]),
-  celular: z.string().nonempty("Celular é obrigatório"),
-  genero: z.enum(["masculino", "feminino", "nao_binario"]),
-  dataNascimento: z.string().nonempty("Data de Nascimento é obrigatória"),
+  nomeCompleto: z.string().nonempty('Nome Completo é obrigatório'),
+  documentoFiscal: z.string().nonempty('CPF é obrigatório'),
+  email: z.string().email('E-mail inválido').nonempty('E-mail é obrigatório'),
+  senha: z.string().min(4, 'Senha deve ter no mínimo 4 caracteres'),
+  tipo: z.enum(['Proprietário', 'Agrônomo', 'Técnico Agrícola']),
+  celular: z.string().nonempty('Celular é obrigatório'),
+  genero: z.enum(['masculino', 'feminino', 'nao_binario']),
+  dataNascimento: z.string().nonempty('Data de Nascimento é obrigatória'),
 });
 
-const perfil = () => {
+const Perfil = () => {
   const [usuario, setUsuario] = useState({
-    idUsuario: "",
-    nomeCompleto: "",
-    documentoFiscal: "",
-    email: "",
-    senha: "",
-    tipo: "",
-    celular: "",
-    genero: "",
-    dataNascimento: "",
+    idUsuario: '',
+    nomeCompleto: '',
+    documentoFiscal: '',
+    email: '',
+    senha: '',
+    tipo: '',
+    celular: '',
+    genero: '',
+    dataNascimento: '',
   });
 
   useEffect(() => {
     const jwt = getJWTFromCookie();
     if (jwt) {
-      buscarUsuarioPorEmail(jwt).then(setUsuario).catch((error) => {
-        console.error(error.message);
-        Swal.fire({
-          icon: "error",
-          title: "Erro!",
-          text: error.message,
-          confirmButtonColor: "#084739",
+      buscarUsuarioPorEmail(jwt)
+        .then(setUsuario)
+        .catch((error) => {
+          console.error(error.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: error.message,
+            confirmButtonColor: '#084739',
+          });
         });
-      });
     }
   }, []);
 
@@ -55,27 +57,28 @@ const perfil = () => {
     const { name, value } = e.target;
     setUsuario((prevUsuario) => ({
       ...prevUsuario,
-      [name]: name === "idUsuario" ? parseInt(value) : value,
+      [name]: name === 'idUsuario' ? parseInt(value) : value,
     }));
   };
 
   const handleSubmit = async () => {
     try {
-      usuarioSchema.parse(usuario);
+      const { criadoEm, status, ...usuarioParaAtualizar } = usuario;
+      usuarioSchema.parse(usuarioParaAtualizar);
       const jwt = getJWTFromCookie();
-      await atualizarUsuario(usuario, jwt);
+      await atualizarUsuario(usuarioParaAtualizar, jwt);
       Swal.fire(
-        "Sucesso!",
-        "Informações do usuário atualizadas com sucesso!",
-        "success"
+        'Sucesso!',
+        'Informações do usuário atualizadas com sucesso!',
+        'success'
       );
     } catch (error) {
       console.error(error.message);
       Swal.fire({
-        icon: "error",
-        title: "Erro!",
+        icon: 'error',
+        title: 'Erro!',
         text: error.message,
-        confirmButtonColor: "#084739",
+        confirmButtonColor: '#084739',
       });
     }
   };
@@ -84,25 +87,25 @@ const perfil = () => {
     try {
       const jwt = getJWTFromCookie();
       await deletarUsuario(usuario, jwt);
-      Swal.fire("Sucesso!", "Usuário deletado com sucesso!", "success");
+      Swal.fire('Sucesso!', 'Usuário deletado com sucesso!', 'success');
       setUsuario({
-        idUsuario: "",
-        nomeCompleto: "",
-        documentoFiscal: "",
-        email: "",
-        senha: "",
-        tipo: "",
-        celular: "",
-        genero: "",
-        dataNascimento: "",
+        idUsuario: '',
+        nomeCompleto: '',
+        documentoFiscal: '',
+        email: '',
+        senha: '',
+        tipo: '',
+        celular: '',
+        genero: '',
+        dataNascimento: '',
       });
     } catch (error) {
       console.error(error.message);
       Swal.fire({
-        icon: "error",
-        title: "Erro!",
+        icon: 'error',
+        title: 'Erro!',
         text: error.message,
-        confirmButtonColor: "#084739",
+        confirmButtonColor: '#084739',
       });
     }
   };
@@ -263,4 +266,4 @@ const perfil = () => {
   );
 };
 
-export default perfil;
+export default Perfil;
