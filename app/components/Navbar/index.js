@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,15 +11,14 @@ const Navbar = () => {
   const MySwal = withReactContent(Swal);
 
   useEffect(() => {
-    // Verifica se o cookie 'jwt' existe
-    const checkJwtCookie = () => {
-      const cookies = document.cookie.split("; ");
-      const jwtCookie = cookies.find((cookie) => cookie.startsWith("jwt="));
-      if (!jwtCookie) {
+    // Verifica se o token JWT existe no sessionStorage
+    const checkJwtToken = () => {
+      const jwtToken = sessionStorage.getItem("jwt");
+      if (!jwtToken) {
         window.location.href = "/";
       }
     };
-    checkJwtCookie();
+    checkJwtToken();
   }, []);
 
   const handleLogout = () => {
@@ -35,13 +34,21 @@ const Navbar = () => {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        // Limpar os cookies
-        document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        // Limpar o token do sessionStorage
+        sessionStorage.removeItem("jwt");
         // Redirecionar para a página de login
         window.location.href = "/";
       }
     });
   };
+
+  // Array de links da Navbar
+  const links = [
+    { href: "/perfil", label: "Meu Perfil" },
+    { href: "/manterusuario", label: "Criar Usuário" },
+    { href: "/manterfazenda", label: "Criar Fazenda" },
+    { href: "/visualizarfazendas", label: "Ver Fazendas" }
+  ];
 
   return (
     <nav className="bg-[#084739] p-4 w-full flex justify-between">
@@ -50,36 +57,13 @@ const Navbar = () => {
       </Link>
       <div>
         <ul className="flex justify-around space-x-8">
-          <li>
-            <Link href="/perfil" className="text-white hover:underline">
-              Meu Perfil
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/manterusuario"
-              className="text-white hover:underline"
-            >
-              Criar Usuário
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/manterfazenda"
-              className="text-white hover:underline"
-            >
-              Criar Fazenda
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/visualizarfazendas"
-              className="text-white hover:underline"
-            >
-              Ver Fazendas
-            </Link>
-            
-          </li>
+          {links.map((link, index) => (
+            <li key={index}>
+              <Link href={link.href} className="text-white hover:underline">
+                {link.label}
+              </Link>
+            </li>
+          ))}
           <li className="flex justify-center items-center w-auto text-orange-500 font-semibold hover:underline hover:text-red-500 cursor-pointer" onClick={handleLogout}>
             Sair
             <FaArrowRightToBracket className="ml-2" />

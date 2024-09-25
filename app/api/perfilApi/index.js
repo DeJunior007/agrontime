@@ -1,7 +1,8 @@
 import axios from "axios";
 import { decodeJWT } from "@/app/tools/decodeJWT";
 
-const apiBaseUrl = "https://back-agrontime.onrender.com";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+;
 const apiSecretKey = "secretApiKey";
 
 export const getJWTFromCookie = () => {
@@ -21,7 +22,7 @@ export const buscarUsuarioPorEmail = async (jwt) => {
   try {
     const email = decodeJWT(jwt).email;
     const response = await axios.post(
-      `${apiBaseUrl}/usuarios/findByEmail`,
+      `${apiBaseUrl}/usuarios/busca-por-email`,
       { email },
       {
         headers: {
@@ -47,8 +48,8 @@ export const atualizarUsuario = async (usuario, jwt) => {
   delete usuarioParaAtualizar.status;
 
   try {
-    await axios.patch(
-      `${apiBaseUrl}/usuarios/update`,
+    await axios.put(
+      `${apiBaseUrl}/usuarios/altera-informacoes-proprietario/` + usuario.idUsuario,
       usuarioParaAtualizar,
       {
         headers: {

@@ -1,15 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import axios from "axios";
 import { getJWTFromCookie } from "../tools/getJwtFromCookie";
 import Navbar from "../components/Navbar";
 import { FaTrash } from "react-icons/fa6";
 import { FaPencil } from "react-icons/fa6";
-
-const apiBaseUrl = "https://back-agrontime.onrender.com";
-const apiSecretKey = "secretApiKey";
-
+import { obterFazendas, deletarFazenda } from "../api/gerenciarFazendaApi";
 const Fazendas = () => {
   const [fazendas, setFazendas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,15 +14,8 @@ const Fazendas = () => {
   useEffect(() => {
     const carregarFazendas = async () => {
       try {
-        const jwt = getJWTFromCookie();
-        const response = await axios.get(`${apiBaseUrl}/fazendas`, {
-          headers: {
-            "api-key": apiSecretKey,
-            Authorization: `Bearer ${jwt}`,
-            "Content-Type": "application/json", // Adicionando Content-Type
-          },
-        });
-        setFazendas(response.data.data); // Atualizando fazendas com response.data.data
+        const response = await obterFazendas(); // Use a função para obter fazendas
+        setFazendas(response.data); // Atualizando fazendas com response.data
         setLoading(false);
       } catch (error) {
         console.error("Erro ao carregar fazendas:", error);
@@ -42,13 +31,8 @@ const Fazendas = () => {
   const handleDelete = async (id) => {
     try {
       const jwt = getJWTFromCookie();
-      await axios.delete(`${apiBaseUrl}/fazendas/${id}`, {
-        headers: {
-          "api-key": apiSecretKey,
-          "Authorization": `Bearer ${jwt}`,
-        },
-      });
-      setFazendas(fazendas.filter((fazenda) => fazenda.idFazenda !== id)); // Verifique se a chave correta é `idFazenda`
+      await deletarFazenda(id, jwt); // Use a função de deletar fazenda
+      setFazendas(fazendas.filter((fazenda) => fazenda.idFazenda !== id)); // Filtrando a fazenda deletada
       Swal.fire("Sucesso!", "Fazenda deletada com sucesso!", "success");
     } catch (error) {
       console.error("Erro ao deletar fazenda:", error);

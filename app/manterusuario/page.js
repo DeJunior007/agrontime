@@ -72,20 +72,20 @@ const ManterUsuario = () => {
     <>
       <Navbar />
       <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <form className="bg-white p-8 rounded shadow-md w-full max-w-4xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <h1 className="text-2xl font-bold mb-6 md:col-span-2">Criar Usuário</h1>
+        <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <h1 className="text-3xl font-bold mb-6 md:col-span-2 text-center text-[#084739]">Criar Usuário</h1>
           <div className="mb-4">
-            <label className="block text-gray-700">Nome Completo</label>
+            <label className="block text-gray-700 font-semibold">Nome Completo</label>
             <input
               type="text"
               name="nomeCompleto"
               value={usuario.nomeCompleto}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">CPF</label>
+            <label className="block text-gray-700 font-semibold">CPF</label>
             <InputMask
               mask="999.999.999-99"
               maskChar="_"
@@ -97,38 +97,38 @@ const ManterUsuario = () => {
                   {...inputProps}
                   type="text"
                   name="documentoFiscal"
-                  className="w-full p-2 border border-gray-300 rounded mt-2"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
                 />
               )}
             </InputMask>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">E-mail</label>
+            <label className="block text-gray-700 font-semibold">E-mail</label>
             <input
               type="email"
               name="email"
               value={usuario.email}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Senha</label>
+            <label className="block text-gray-700 font-semibold">Senha</label>
             <input
               type="password"
               name="senha"
               value={usuario.senha}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Tipo</label>
+            <label className="block text-gray-700 font-semibold">Tipo</label>
             <select
               name="tipo"
               value={usuario.tipo}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             >
               <option value="">Selecione...</option>
               <option value="Técnico Agrícola">Técnico Agrícola</option>
@@ -137,22 +137,22 @@ const ManterUsuario = () => {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Celular</label>
+            <label className="block text-gray-700 font-semibold">Celular</label>
             <input
               type="text"
               name="celular"
               value={usuario.celular}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Gênero</label>
+            <label className="block text-gray-700 font-semibold">Gênero</label>
             <select
               name="genero"
               value={usuario.genero}
               onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
             >
               <option value="">Selecione...</option>
               <option value="masculino">Masculino</option>
@@ -161,7 +161,7 @@ const ManterUsuario = () => {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Data de Nascimento</label>
+            <label className="block text-gray-700 font-semibold">Data de Nascimento</label>
             <InputMask
               mask="99/99/9999"
               maskChar="_"
@@ -173,22 +173,22 @@ const ManterUsuario = () => {
                   {...inputProps}
                   type="text"
                   name="dataNascimento"
-                  className="w-full p-2 border border-gray-300 rounded mt-2"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
                 />
               )}
             </InputMask>
           </div>
-          <div className="flex justify-end mt-4 md:col-span-2">
+          <div className="flex justify-end mt-6 md:col-span-2">
             <button
               type="button"
               onClick={handleCreateUser}
-              className="bg-blue-500 text-white p-2 rounded"
+              className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
             >
               Criar Usuário
             </button>
           </div>
         </form>
-        <pre className="bg-gray-200 p-4 w-full max-w-4xl overflow-auto">
+        <pre className="bg-gray-200 p-4 w-full max-w-4xl overflow-auto rounded-lg shadow">
           {formattedJson}
         </pre>
       </main>
