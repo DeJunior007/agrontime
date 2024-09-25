@@ -43,7 +43,7 @@ const ManterUsuario = () => {
   const handleCreateUser = async () => {
     try {
       usuarioSchema.parse(usuario);
-      await criarUsuario(usuario);
+      await criarFuncionario(usuario);
       Swal.fire('Sucesso!', 'Novo usuário criado com sucesso!', 'success');
     } catch (error) {
       if (error instanceof z.ZodError) {
