@@ -1,17 +1,19 @@
 'use client';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import logo from "../../../public/imgs/png/logo.png";
 import { FaArrowRightToBracket } from "react-icons/fa6";
+import Dropdown from "../Dropdown";
+import navbarData from './navbar.json';
 
 const Navbar = () => {
   const MySwal = withReactContent(Swal);
+  const [userRole, setUserRole] = useState("master");
 
   useEffect(() => {
-    // Verifica se o token JWT existe no sessionStorage
     const checkJwtToken = () => {
       const jwtToken = sessionStorage.getItem("jwt");
       if (!jwtToken) {
@@ -34,21 +36,14 @@ const Navbar = () => {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        // Limpar o token do sessionStorage
         sessionStorage.removeItem("jwt");
-        // Redirecionar para a página de login
         window.location.href = "/";
       }
     });
   };
 
-  // Array de links da Navbar
-  const links = [
-    { href: "/perfil", label: "Meu Perfil" },
-    { href: "/manterusuario", label: "Criar Usuário" },
-    { href: "/manterfazenda", label: "Criar Fazenda" },
-    { href: "/visualizarfazendas", label: "Ver Fazendas" }
-  ];
+  const farmOptions = navbarData.cargos[userRole].fazenda;
+  const cultureOptions = navbarData.cargos[userRole].cultura;
 
   return (
     <nav className="bg-[#084739] p-4 w-full flex justify-between">
@@ -57,14 +52,18 @@ const Navbar = () => {
       </Link>
       <div>
         <ul className="flex justify-around space-x-8">
-          {links.map((link, index) => (
-            <li key={index}>
-              <Link href={link.href} className="text-white hover:underline">
-                {link.label}
-              </Link>
-            </li>
-          ))}
-          <li className="flex justify-center items-center w-auto text-orange-500 font-semibold hover:underline hover:text-red-500 cursor-pointer" onClick={handleLogout}>
+        <li>
+            <Link href="/perfil" className="text-white hover:underline">
+              Meu Perfil
+            </Link>
+          </li>
+          <li>
+            <Dropdown title="Fazenda" options={farmOptions} />
+          </li>
+          <li>
+            <Dropdown title="Cultura" options={cultureOptions} />
+          </li>
+                   <li className="flex justify-center items-center w-auto text-orange-500 font-semibold hover:underline hover:text-red-500 cursor-pointer" onClick={handleLogout}>
             Sair
             <FaArrowRightToBracket className="ml-2" />
           </li>

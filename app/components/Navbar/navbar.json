@@ -1,0 +1,19 @@
+{
+    "cargos": {
+      "master": {
+        "fazenda": [
+          { "label": "Criar Fazenda", "href": "/manterfazenda" },
+          { "label": "Gerenciar Fazenda", "href": "/visualizarfazendas" }
+        ],
+        "cultura": [
+          { "label": "Criar Cultura", "href": "/mantercultura" },
+          { "label": "Gerenciar Cultura", "href": "/visualizarcultura" }
+        ],
+        "funcionario": [
+          { "label": "Criar Funcionário", "href": "/manterusuario" },
+          { "label": "Gerenciar Funcionário", "href": "/visualizarusuarios" }
+        ]
+      }
+    }
+  }
+  
