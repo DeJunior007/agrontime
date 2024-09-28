@@ -1,0 +1,15 @@
+[
+    {
+      "id": "email",
+      "type": "email",
+      "label": "E-mail",
+      "validation": "email"
+    },
+    {
+      "id": "password",
+      "type": "password",
+      "label": "Senha",
+      "validation": "password"
+    }
+  ]
+  
