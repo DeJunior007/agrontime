@@ -1,61 +1,119 @@
-'use client'
-import React, { useState } from 'react';
-import authLogin from '@/app/api/authLogin';
-import Link from 'next/link';
+"use client";
+import React, { useState } from "react";
+import authLogin from "@/app/api/authLogin";
+import Link from "next/link";
+import Input from "../Input.js";
+import { validateEmail, validatePassword } from "@/app/utils/validate";
+import Loading from "../Loading"; // Importe o componente Loading
+import forms from "./forms.json"; // Importando o forms.json
 
 export default function LoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [formErrors, setFormErrors] = useState({
+    email: false,
+    password: false,
+  });
+  const [loading, setLoading] = useState(false); // Estado para loading
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Limpar erro ao digitar
+    setFormErrors((prev) => ({
+      ...prev,
+      [name]: false,
+    }));
+  };
+
+  const handleBlur = (name) => {
+    if (name === "email") {
+      setFormErrors((prev) => ({
+        ...prev,
+        email: !validateEmail(formData.email),
+      }));
+    } else if (name === "password") {
+      setFormErrors((prev) => ({
+        ...prev,
+        password: !validatePassword(formData.password),
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    let hasError = false;
+
+    // Validação
+    if (!validateEmail(formData.email)) {
+      setFormErrors((prev) => ({ ...prev, email: true }));
+      hasError = true;
+    }
+    if (!validatePassword(formData.password)) {
+      setFormErrors((prev) => ({ ...prev, password: true }));
+      hasError = true;
+    }
+
+    if (hasError) {
+      return; // Interrompe o submit se houver erro
+    }
+
+    setLoading(true); // Ativa o loading
 
     try {
-      await authLogin(email, password);
+      await authLogin(formData.email, formData.password);
     } catch (error) {
-      console.error('Erro durante o login:', error);
-      // Tratar o erro conforme necessário
+      console.error("Erro durante o login:", error);
+    } finally {
+      setLoading(false); // Desativa o loading
     }
   };
 
   return (
-    <div className="h-screen bg-white flex items-start justify-start p-20">
-      <form className="w-full max-w h-full" onSubmit={handleSubmit}>
-        <h2 className="text-4xl font-bold mb-10 text-center">Login</h2>
-        <div className="mb-4">
-          <label htmlFor="username" className="block text-gray-700 mb-1">
-            E-mail
-          </label>
-          <input
-            type="email"
-            id="email"
-            className="w-full py-2 border-b-4 border-slate-200 outline-none"
-            placeholder="Digite seu e-mail"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="mb-6">
-          <label htmlFor="password" className="block text-gray-700 mb-1 ">
-            Senha
-          </label>
-          <input
-            type="password"
-            id="password"
-            className="w-full py-2 border-b-4 border-slate-200 outline-none"
-            placeholder="Digite sua senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full mx-auto bg-[#084739] font-semibold text-white py-2 rounded hover:bg-[#F35746] transition duration-300"
-        >
-          Login
-        </button>
-        <Link href='/registro' className='text-slate-600 mt-4 hover:text-slate-900 block text-center'>Cadastra-se clicando aqui!</Link>
-      </form>
+    <div className="bg-white max-w-[800px] lg:p-10 p-5 w-[90%] lg:w-full shadow-2xl rounded-2xl">
+      {loading ? ( // Exibe o componente Loading se estiver carregando
+        <Loading />
+      ) : (
+        <form className="w-full h-full" onSubmit={handleSubmit}>
+          <h2 className="text-4xl font-bold text-center mb-6">Login</h2>
+
+          {forms.map((field) => (
+            <div key={field.id}>
+              <Input
+                id={field.id}
+                type={field.type}
+                label={field.label}
+                name={field.id} // Adicionando name para controle de estado
+                value={formData[field.id]} // Usando o valor do estado dinâmico
+                onChange={handleChange}
+                onBlur={() => handleBlur(field.id)} // Passando o id do campo
+                error={formErrors[field.id]} // Verificando erros individuais
+              />
+              <br />
+            </div>
+          ))}
+
+          <button
+            type="submit"
+            className="w-full mt-10 mx-auto bg-[#084739] font-semibold text-white py-2 rounded-lg hover:bg-[#F35746] transition duration-300"
+          >
+            Login
+          </button>
+
+          <Link
+            href="/registro"
+            className="text-gray-600 mt-4 hover:text-[#F35746] block text-center"
+          >
+            Cadastra-se clicando aqui!
+          </Link>
+        </form>
+      )}
     </div>
   );
-};
+}
