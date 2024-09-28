@@ -1,0 +1,60 @@
+[
+    {
+      "id": "nomeCompleto",
+      "label": "Nome Completo",
+      "type": "text",
+      "name": "nomeCompleto",
+      "validation": "required"
+    },
+    {
+      "id": "documentoFiscal",
+      "label": "CPF",
+      "type": "text",
+      "name": "documentoFiscal",
+      "validation": "required",
+      "mask": "999.999.999.99"
+    },
+    {
+      "id": "email",
+      "label": "E-mail",
+      "type": "email",
+      "name": "email",
+      "validation": "email"
+    },
+    {
+      "id": "senha",
+      "label": "Senha",
+      "type": "password",
+      "name": "senha",
+      "validation": "password"
+    },
+    {
+      "id": "celular",
+      "label": "Celular",
+      "type": "text",
+      "name": "celular",
+      "validation": "required",
+      "mask": "(99) 99999-9999" 
+    },
+    {
+      "id": "genero",
+      "label": "Gênero",
+      "type": "select",
+      "name": "genero",
+      "validation": "required",
+      "options": [
+        { "value": "M", "label": "Masculino" },
+        { "value": "F", "label": "Feminino" },
+        { "value": "O", "label": "Não Binário" }
+      ]
+    },
+    {
+      "id": "dataNascimento",
+      "label": "Data de Nascimento",
+      "type": "text",
+      "name": "dataNascimento",
+      "validation": "required",
+      "mask": "99/99/9999"
+    }
+  ]
+  
