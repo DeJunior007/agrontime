@@ -2,23 +2,8 @@ import React from 'react';
 
 const Loading = () => {
   return (
-    <div className="flex justify-center items-center ">
-      <div className="loader">
-        <style jsx>{`
-          .loader {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #084739; 
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-          }
-
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
+    <div className="flex justify-center items-center h-full">
+      <div className="border-8 border-t-8 border-gray-300 border-t-[#084739] rounded-full w-24 h-24 animate-spin">
       </div>
     </div>
   );

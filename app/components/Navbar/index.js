@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,11 +7,13 @@ import withReactContent from "sweetalert2-react-content";
 import logo from "../../../public/imgs/png/logo.png";
 import { FaArrowRightToBracket } from "react-icons/fa6";
 import Dropdown from "../Dropdown";
-import navbarData from './navbar.json';
+import NavbarMobile from "./NavbarMobile"; 
+import navbarData from "./navbar.json";
 
 const Navbar = () => {
   const MySwal = withReactContent(Swal);
   const [userRole, setUserRole] = useState("master");
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   useEffect(() => {
     const checkJwtToken = () => {
@@ -32,8 +34,8 @@ const Navbar = () => {
       confirmButtonColor: "#084739",
       cancelButtonColor: "#d33",
       confirmButtonText: "Sim, encerrar sessão!",
-      cancelButtonText: 'Cancelar',
-      reverseButtons: true
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
     }).then((result) => {
       if (result.isConfirmed) {
         sessionStorage.removeItem("jwt");
@@ -42,32 +44,44 @@ const Navbar = () => {
     });
   };
 
-  const farmOptions = navbarData.cargos[userRole].fazenda;
-  const cultureOptions = navbarData.cargos[userRole].cultura;
+  const dropdowns = navbarData.cargos[userRole].map((category, index) => (
+    <li key={index}>
+      <Dropdown
+        title={category.category}
+        options={category.options}
+        isOpen={openDropdown === index}
+        toggleDropdown={() =>
+          setOpenDropdown(openDropdown === index ? null : index)
+        }
+      />
+    </li>
+  ));
 
   return (
     <nav className="bg-[#084739] p-4 w-full flex justify-between">
-      <Link href={'/home'}>
+      <Link href={"/home"}>
         <Image src={logo} className="rounded-full" width={25} alt="Logo" />
       </Link>
       <div>
-        <ul className="flex justify-around space-x-8">
-        <li>
-            <Link href="/perfil" className="text-white hover:underline">
+        <ul className="hidden md:flex justify-around space-x-8 items-center">
+          <li>
+            <Link
+              href="/perfil"
+              className={`inline-flex w-full justify-center gap-x-1.5 rounded-md bg-[#084739] px-4 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-[#0A5A40] transition-all duration-200 active:scale-95 active:shadow-none`}
+            >
               Meu Perfil
             </Link>
           </li>
-          <li>
-            <Dropdown title="Fazenda" options={farmOptions} />
-          </li>
-          <li>
-            <Dropdown title="Cultura" options={cultureOptions} />
-          </li>
-                   <li className="flex justify-center items-center w-auto text-orange-500 font-semibold hover:underline hover:text-red-500 cursor-pointer" onClick={handleLogout}>
+          {dropdowns}
+          <li
+            className="flex justify-center items-center w-auto text-warning font-semibold hover:bg-warning hover:text-white transition-colors duration-200 cursor-pointer rounded-md p-2"
+            onClick={handleLogout}
+          >
             Sair
             <FaArrowRightToBracket className="ml-2" />
           </li>
         </ul>
+        <NavbarMobile dropdowns={dropdowns} handleLogout={handleLogout} />
       </div>
     </nav>
   );
