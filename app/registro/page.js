@@ -102,7 +102,7 @@ const ManterUsuario = () => {
         email: "",
         senha: "",
         celular: "",
-        genero: "M", // Resetando gênero para masculino
+        genero: "M", 
         dataNascimento: "",
       });
     } catch (error) {
@@ -112,7 +112,7 @@ const ManterUsuario = () => {
 
   return (
     <section className="flex flex-col items-center min-h-screen bg-purple-900 p-8">
-      <div className="container mt-40 p-8 bg-white rounded-lg shadow-md">
+      <div className="container mt-10 p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-3xl font-bold text-center mb-6">
           Cadastro de Usuário
         </h1>
@@ -120,23 +120,30 @@ const ManterUsuario = () => {
           Preencha os campos abaixo para criar uma conta e gerenciar sua fazenda de forma eficiente.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {inputFields.map((field, index) => (
-            <div key={index} className="form-group">
-              <Input
-                id={field.id}
-                type={field.type}
-                name={field.name}
-                label={field.label}
-                value={usuario[field.name]}
-                onChange={handleChange}
-                onBlur={() => handleBlur(field.name)}
-                error={errors[field.name] ? true : false}
-                options={field.options}
-                mask={field.mask}
-              />
-              {errors[field.name] && <p className="text-red-500 text-sm">{errors[field.name]}</p>}
-            </div>
-          ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {inputFields.map((field, index) => (
+              <div key={index} className="form-group flex flex-col">
+                <div className="flex items-center mb-1">
+                  <i className={`${field.icon} text-gray-500 mr-2`}></i> {/* Ícone aqui */}
+                  <Input
+                    id={field.id}
+                    type={field.type}
+                    name={field.name}
+                    label={field.label}
+                    value={usuario[field.name]}
+                    onChange={handleChange}
+                    onBlur={() => handleBlur(field.name)}
+                    error={errors[field.name] ? true : false}
+                    options={field.options}
+                    mask={field.mask}
+                  />
+                </div>
+                {errors[field.name] && (
+                  <p className="text-red-500 text-[12px] ml-6">{errors[field.name]}</p>
+                )}
+              </div>
+            ))}
+          </div>
           <button
             type="submit"
             className="w-full py-2 mt-4 bg-[#084739] text-white font-semibold rounded-md hover:bg-[#053f33] transition duration-200"

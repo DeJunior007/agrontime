@@ -1,269 +1,168 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { z } from "zod";
-import Swal from "sweetalert2";
 import Navbar from "../components/Navbar";
-import InputMask from "react-input-mask";
-import {
-  getJWTFromCookie,
-  buscarUsuarioPorEmail,
-  atualizarUsuario,
-  deletarUsuario,
-} from "../api/perfilApi";
+import Input from "../components/Input.js";
+import { usuarioSchema } from "./zod";
+import formConfig from "./forms.json";
+import Swal from "sweetalert2";
+import Loading from "../components/Loading";
+import { atualizarUsuario } from "../api/perfilApi";
 
-const usuarioSchema = z.object({
-  idUsuario: z.number().optional(),
-  nomeCompleto: z.string().min(1, "Nome Completo é obrigatório"),
-  documentoFiscal: z.string().min(1, "CPF é obrigatório"),
-  email: z.string().email("E-mail inválido").min(1, "E-mail é obrigatório"),
-  senha: z.string().min(4, "Senha deve ter no mínimo 4 caracteres"),
-  tipo: z.enum(["Proprietário", "Agrônomo", "Técnico Agrícola"]),
-  celular: z.string().min(1, "Celular é obrigatório"),
-  genero: z.enum(["masculino", "feminino", "nao_binario"]),
-  dataNascimento: z.string().min(1, "Data de Nascimento é obrigatória"),
-});
-
-const Perfil = () => {
+const EditarPerfil = () => {
+  const [fieldsConfig, setFieldsConfig] = useState([]);
   const [usuario, setUsuario] = useState({
-    idUsuario: "",
+    idUsuario: 1,
     nomeCompleto: "",
     documentoFiscal: "",
     email: "",
-    senha: "",
-    tipo: "",
-    celular: "",
     genero: "",
+    senha: "",
     dataNascimento: "",
+    celular: "",
   });
+  const [errors, setErrors] = useState({});
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
-    const jwt = getJWTFromCookie();
-    if (jwt) {
-      buscarUsuarioPorEmail(jwt)
-        .then(setUsuario)
-        .catch((error) => {
-          console.error(error.message);
-          Swal.fire({
-            icon: "error",
-            title: "Erro!",
-            text: error.message,
-            confirmButtonColor: "#084739",
-          });
-        });
-    }
+    setFieldsConfig(formConfig);
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUsuario((prevUsuario) => ({
       ...prevUsuario,
-      [name]: name === "idUsuario" ? parseInt(value) : value,
+      [name]: value,
     }));
   };
 
-  const handleSubmit = async () => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePicture(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const { criadoEm, status, ...usuarioParaAtualizar } = usuario;
-      usuarioSchema.parse(usuarioParaAtualizar);
-      const jwt = getJWTFromCookie();
-      await atualizarUsuario(usuarioParaAtualizar, jwt);
-      Swal.fire(
-        "Sucesso!",
-        "Informações do usuário atualizadas com sucesso!",
-        "success"
-      );
+      usuarioSchema.parse(usuario);
+      console.log(usuarioSchema)
+      await atualizarUsuario(usuario);
+      Swal.fire("Sucesso!", "Perfil atualizado com sucesso!", "success");
     } catch (error) {
-      console.error(error.message);
+      const formErrors = {};
+      if (error.errors) {
+        error.errors.forEach((err) => {
+          formErrors[err.path[0]] = err.message;
+        });
+      }
+      setErrors(formErrors);
       Swal.fire({
         icon: "error",
         title: "Erro!",
-        text: error.message,
+        text: "Por favor, verifique os campos do formulário.",
         confirmButtonColor: "#084739",
       });
     }
   };
-
-  const handleDeleteUser = async () => {
-    try {
-      const jwt = getJWTFromCookie();
-      await deletarUsuario(usuario, jwt);
-      Swal.fire("Sucesso!", "Usuário deletado com sucesso!", "success");
-      setUsuario({
-        idUsuario: "",
-        nomeCompleto: "",
-        documentoFiscal: "",
-        email: "",
-        senha: "",
-        tipo: "",
-        celular: "",
-        genero: "",
-        dataNascimento: "",
-      });
-    } catch (error) {
-      console.error(error.message);
-      Swal.fire({
-        icon: "error",
-        title: "Erro!",
-        text: error.message,
-        confirmButtonColor: "#084739",
-      });
-    }
-  };
-
-  const formattedJson = JSON.stringify(usuario, null, 2);
 
   return (
-    <>
+    <div className="bg-gray-100 min-h-screen">
       <Navbar />
-      <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <form className="bg-white p-8 rounded shadow-md w-full max-w-4xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <h1 className="text-2xl font-bold mb-6 md:col-span-2">
-            Atualizar meu Perfil
+      <main className="flex flex-col items-center p-8">
+        <form
+          className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 space-y-6"
+          onSubmit={handleSubmit}
+        >
+          <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
+            Editar Perfil
           </h1>
-          <div className="mb-4">
-            <label className="block text-gray-700">E-mail</label>
-            <input
-              type="email"
-              name="email"
-              value={usuario.email}
-              onChange={(e) =>
-                setUsuario({ ...usuario, email: e.target.value })
-              }
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            />
+          <p className="text-gray-600 text-center mt-2">
+            Atualize suas informações de perfil.
+          </p>
+
+          <div className="flex flex-col items-center mb-4">
+            <label className="block text-gray-700 mb-2">Foto de Perfil</label>
+            {profilePicture && (
+              <img
+                src={profilePicture}
+                alt="Preview"
+                className="w-32 h-32 rounded-full mb-2 object-cover shadow-lg border border-gray-300"
+              />
+            )}
+            <div className="flex items-center flex-col space-y-4 mb-4">
+              <div className="flex flex-col">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-input"
+                />
+                <label
+                  htmlFor="file-input"
+                  className="border border-gray-300 rounded-lg p-2 bg-white hover:bg-gray-100 transition duration-300 ease-in-out cursor-pointer flex items-center justify-center"
+                >
+                  <span className="text-gray-700">Escolher Arquivo</span>
+                </label>
+                {profilePicture && (
+                  <span className="mt-2 text-gray-500">
+                    {profilePicture.split("/").pop()}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setProfilePicture(null)}
+                className="bg-red-500 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
+              >
+                Remover Foto
+              </button>
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700">ID do Usuário</label>
-            <input
-              type="number"
-              name="idUsuario"
-              value={usuario.idUsuario}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {!Array.isArray(fieldsConfig) || !fieldsConfig.length > 0 ? (
+    <div className="flex items-center justify-center w-full h-full col-span-1 md:col-span-2">
+                <Loading />
+              </div>
+            ) : (
+              fieldsConfig.map((field, index) => (
+                <div key={index} className="form-group flex flex-col">
+                  <div className="flex items-center ">
+                    <i className={`${field.icon} text-gray-500 mr-2`}></i>
+                    <Input
+                       id={field.id}
+                       type={field.type}
+                       name={field.name}
+                       label={field.label}
+                       value={usuario[field.name] || ""}
+                       onChange={handleChange}
+                       error={errors[field.name] ? true : false}
+                       options={field.options}
+                       mask={field.mask}
+                    />
+                  </div>
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-[12px] ml-6">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Nome Completo</label>
-            <input
-              type="text"
-              name="nomeCompleto"
-              value={usuario.nomeCompleto}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">CPF</label>
-            <InputMask
-              mask="999.999.999-99"
-              maskChar="_"
-              value={usuario.documentoFiscal}
-              onChange={(e) =>
-                setUsuario({ ...usuario, documentoFiscal: e.target.value })
-              }
-            >
-              {(inputProps) => (
-                <input
-                  {...inputProps}
-                  type="text"
-                  name="documentoFiscal"
-                  className="w-full p-2 border border-gray-300 rounded mt-2"
-                />
-              )}
-            </InputMask>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Senha</label>
-            <input
-              type="password"
-              name="senha"
-              value={usuario.senha}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Tipo</label>
-            <select
-              name="tipo"
-              value={usuario.tipo}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            >
-              <option value="">Selecione...</option>
-              <option value="Proprietário">Proprietário</option>
-              <option value="Agrônomo">Agrônomo</option>
-              <option value="Técnico Agrícola">Técnico Agrícola</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Celular</label>
-            <input
-              type="text"
-              name="celular"
-              value={usuario.celular}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Gênero</label>
-            <select
-              name="genero"
-              value={usuario.genero}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded mt-2"
-            >
-              <option value="">Selecione...</option>
-              <option value="masculino">Masculino</option>
-              <option value="feminino">Feminino</option>
-              <option value="nao_binario">Não Binário</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Data de Nascimento</label>
-            <InputMask
-              mask="99/99/9999"
-              maskChar="_"
-              value={usuario.dataNascimento}
-              onChange={(e) =>
-                setUsuario({ ...usuario, dataNascimento: e.target.value })
-              }
-            >
-              {(inputProps) => (
-                <input
-                  {...inputProps}
-                  type="text"
-                  name="dataNascimento"
-                  className="w-full p-2 border border-gray-300 rounded mt-2"
-                />
-              )}
-            </InputMask>
-          </div>
-          <div className="flex justify-end mt-4 md:col-span-2">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-green-500 text-white p-2 rounded mr-2"
-            >
-              Atualizar Informações
-            </button>
-            <button
-              type="button"
-              onClick={handleDeleteUser}
-              className="bg-red-500 text-white p-2 rounded"
-            >
-              Deletar Usuário
-            </button>
-          </div>
+
+          <button
+            type="submit"
+            className="bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out justify-self-end"
+          >
+            Atualizar Perfil
+          </button>
         </form>
-        <pre className="bg-gray-200 p-4 w-full max-w-4xl overflow-auto">
-          {formattedJson}
-        </pre>
       </main>
-    </>
+    </div>
   );
 };
 
-export default Perfil;
+export default EditarPerfil;

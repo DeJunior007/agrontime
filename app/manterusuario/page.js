@@ -1,199 +1,169 @@
-'use client';
-import React, { useState } from 'react';
-import { z } from 'zod';
-import Swal from 'sweetalert2';
-import Navbar from '../components/Navbar';
-import InputMask from 'react-input-mask';
-import { criarUsuario } from '../api/usuariosAPI';
+"use client";
+import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import Navbar from "../components/Navbar";
+import Input from "../components/Input.js";
+import Loading from "../components/Loading"; // Importando o componente Loading
+import { criarFuncionario } from "../api/usuariosAPI";
+import formsConfig from "./forms.json";
+import { funcionarioSchema } from "./zod";
+import z from "zod";
+import { obterFazendas } from "../api/gerenciarFazendaApi";
 
-const usuarioSchema = z.object({
-  nomeCompleto: z.string().nonempty('Nome Completo é obrigatório'),
-  documentoFiscal: z.string().nonempty('CPF é obrigatório'),
-  email: z.string().email('E-mail inválido').nonempty('E-mail é obrigatório'),
-  senha: z
-    .string()
-    .min(8, 'Senha deve ter no mínimo 8 caracteres')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&^_+|~=`{}\[\]:";'<>?,.\/\\-])[A-Za-z\d@$!%*#?&^_+|~=`{}\[\]:";'<>?,.\/\\-]{8,}$/, 'Senha deve conter letras maiúsculas e minúsculas, números e caracteres especiais'),
-  tipo: z.enum(['Proprietário', 'Agrônomo', 'Técnico Agrícola']).optional('Tipo é obrigatório'),
-  celular: z.string().nonempty('Celular é obrigatório'),
-  genero: z.enum(['masculino', 'feminino', 'nao_binario']).optional('Gênero é obrigatório'),
-  dataNascimento: z.string().nonempty('Data de Nascimento é obrigatória'),
-});
-
-const ManterUsuario = () => {
-  const [usuario, setUsuario] = useState({
-    nomeCompleto: '',
-    documentoFiscal: '',
-    email: '',
-    senha: '',
-    tipo: '',
-    celular: '',
-    genero: '',
-    dataNascimento: '',
+const ManterFuncionario = () => {
+  const [funcionario, setFuncionario] = useState({
+    idFazenda: "",
+    nomeCompleto: "",
+    documentoFiscal: "",
+    email: "",
+    senha: "",
+    tipo: "",
+    celular: "",
+    genero: "",
+    dataNascimento: "",
   });
+
+  const [fazendas, setFazendas] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [fieldsConfig, setFieldsConfig] = useState([]);
+
+  useEffect(() => {
+    const fetchFazendas = async () => {
+      try {
+        const { data } = await obterFazendas();
+        if (data && data.length > 0) {
+          setFazendas(data);
+          const fazendaField = {
+            id: "idFazenda",
+            name: "idFazenda",
+            type: "select",
+            label: "Selecione uma Fazenda",
+            icon: "fa fa-warehouse",
+            options: data.map((fazenda) => ({
+              value: fazenda.idFazenda,
+              label: fazenda.nome,
+            })),
+          };
+          setFieldsConfig([fazendaField, ...formsConfig]);
+        } else {
+          const result = await Swal.fire({
+            title: "Nenhuma fazenda encontrada!",
+            text: "Gostaria de criar uma nova fazenda?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sim",
+            cancelButtonText: "Não",
+          });
+          if (result.isConfirmed) {
+            window.location.href = "/manterfazenda";
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao obter fazendas:", error);
+      }
+    };
+
+    fetchFazendas();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUsuario((prevUsuario) => ({
-      ...prevUsuario,
+    setFuncionario((prevFuncionario) => ({
+      ...prevFuncionario,
       [name]: value,
     }));
   };
 
-  const handleCreateUser = async () => {
+  const handleSubmit = async () => {
     try {
-      usuarioSchema.parse(usuario);
-      await criarFuncionario(usuario);
-      Swal.fire('Sucesso!', 'Novo usuário criado com sucesso!', 'success');
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map((err) => err.message).join(', ');
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro!',
-          text: `Ocorreu um erro ao criar novo usuário: ${errorMessages}`,
-          confirmButtonColor: '#084739',
-        });
-      } else {
-        console.error('Erro ao criar usuário:', error);
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro!',
-          text: 'Ocorreu um erro ao criar novo usuário.',
-          confirmButtonColor: '#084739',
-        });
-      }
-    }
-  };
+        // Valida todos os campos de uma só vez
+        funcionarioSchema.parse(funcionario);
+        
+        // Se a validação passar, faz a requisição
+        const dadosComIdFazenda = {
+            ...funcionario,
+            idFazenda: funcionario.idFazenda,
+        };
+        console.log(dadosComIdFazenda)
 
-  const formattedJson = JSON.stringify(usuario, null, 2);
+        await criarFuncionario(dadosComIdFazenda);
+        Swal.fire("Sucesso!", "Novo funcionário criado com sucesso!", "success");
+    } catch (error) {
+        if (error instanceof z.ZodError) {
+            // Acumula todos os erros de validação
+            const errorMessages = error.errors.reduce((acc, err) => {
+                acc[err.path[0]] = err.message;
+                return acc;
+            }, {});
+            setErrors(errorMessages);
+        } else {
+            console.error("Erro ao criar funcionário:", error);
+            Swal.fire({
+                icon: "error",
+                title: "Erro!",
+                text: "Ocorreu um erro ao criar novo funcionário.",
+                confirmButtonColor: "#084739",
+            });
+        }
+    }
+};
+
 
   return (
     <>
       <Navbar />
       <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          <h1 className="text-3xl font-bold mb-6 md:col-span-2 text-center text-[#084739]">Criar Usuário</h1>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Nome Completo</label>
-            <input
-              type="text"
-              name="nomeCompleto"
-              value={usuario.nomeCompleto}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">CPF</label>
-            <InputMask
-              mask="999.999.999-99"
-              maskChar="_"
-              value={usuario.documentoFiscal}
-              onChange={handleChange}
-            >
-              {(inputProps) => (
-                <input
-                  {...inputProps}
-                  type="text"
-                  name="documentoFiscal"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-                />
-              )}
-            </InputMask>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">E-mail</label>
-            <input
-              type="email"
-              name="email"
-              value={usuario.email}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Senha</label>
-            <input
-              type="password"
-              name="senha"
-              value={usuario.senha}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Tipo</label>
-            <select
-              name="tipo"
-              value={usuario.tipo}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            >
-              <option value="">Selecione...</option>
-              <option value="Técnico Agrícola">Técnico Agrícola</option>
-              <option value="Agrônomo">Agrônomo</option>
-              <option value="Proprietário">Proprietário</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Celular</label>
-            <input
-              type="text"
-              name="celular"
-              value={usuario.celular}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Gênero</label>
-            <select
-              name="genero"
-              value={usuario.genero}
-              onChange={handleChange}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-            >
-              <option value="">Selecione...</option>
-              <option value="masculino">Masculino</option>
-              <option value="feminino">Feminino</option>
-              <option value="nao_binario">Não Binário</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 font-semibold">Data de Nascimento</label>
-            <InputMask
-              mask="99/99/9999"
-              maskChar="_"
-              value={usuario.dataNascimento}
-              onChange={handleChange}
-            >
-              {(inputProps) => (
-                <input
-                  {...inputProps}
-                  type="text"
-                  name="dataNascimento"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#084739] transition duration-200"
-                />
-              )}
-            </InputMask>
+        <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 space-y-6">
+          <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
+            Criar Funcionário
+          </h1>
+          <p className="text-gray-600 text-center mt-2">
+            Aqui, você pode criar um novo funcionário para sua fazenda.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {!Array.isArray(fieldsConfig) || !fieldsConfig.length > 0 ? (
+    <div className="flex items-center justify-center w-full h-full col-span-1 md:col-span-2">
+                <Loading />
+              </div>
+            ) : (
+              fieldsConfig.map((field, index) => (
+                <div key={index} className="form-group flex flex-col">
+                  <div className="flex items-center ">
+                    <i className={`${field.icon} text-gray-500 mr-2`}></i>
+                    <Input
+                      id={field.id}
+                      type={field.type}
+                      name={field.name}
+                      label={field.label}
+                      value={funcionario[field.name]}
+                      onChange={handleChange}
+                      error={errors[field.name] ? true : false}
+                      options={field.options}
+                      mask={field.mask}
+                    />
+                  </div>
+                  {errors[field.name] && (
+                    <p className="text-red-500 text-[12px] ml-6">
+                      {errors[field.name]}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
           </div>
           <div className="flex justify-end mt-6 md:col-span-2">
             <button
               type="button"
-              onClick={handleCreateUser}
+              onClick={handleSubmit}
               className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
             >
-              Criar Usuário
+              Criar Funcionário
             </button>
           </div>
         </form>
-        <pre className="bg-gray-200 p-4 w-full max-w-4xl overflow-auto rounded-lg shadow">
-          {formattedJson}
-        </pre>
       </main>
     </>
   );
 };
 
-export default ManterUsuario;
+export default ManterFuncionario;
