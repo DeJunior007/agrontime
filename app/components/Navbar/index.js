@@ -60,7 +60,7 @@ const Navbar = () => {
   return (
     <nav className="bg-[#084739] p-4 w-full flex justify-between">
       <Link href={"/home"}>
-        <Image src={logo} className="rounded-full" width={25} alt="Logo" />
+        <Image src={logo} className="rounded-full" width={35} alt="Logo" />
       </Link>
       <div>
         <ul className="hidden md:flex justify-around space-x-8 items-center">

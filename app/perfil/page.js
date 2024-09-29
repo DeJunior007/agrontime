@@ -153,12 +153,15 @@ const EditarPerfil = () => {
             )}
           </div>
 
-          <button
-            type="submit"
-            className="bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition duration-300 ease-in-out justify-self-end"
-          >
-            Atualizar Perfil
-          </button>
+          <div className="flex justify-end mt-6 md:col-span-2">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
+            >
+              Criar Funcionário
+            </button>
+          </div>
         </form>
       </main>
     </div>

@@ -202,11 +202,11 @@ const CriarFazenda = () => {
               </div>
             ))}
           </div>
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-end mt-6 md:col-span-2">
             <button
               type="button"
               onClick={handleSubmit}
-              className="bg-green-600 text-white font-semibold py-4 px-8 rounded-lg shadow-lg hover:bg-green-700 transition duration-300"
+              className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
             >
               Criar Fazenda
             </button>
