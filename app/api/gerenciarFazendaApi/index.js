@@ -9,48 +9,40 @@ const apiKey = "secretApiKey"; // Substitua pela sua chave API se necessário
  * @param {Object} dadosFazenda - Dados da fazenda a serem enviados.
  * @returns {Promise<void>}
  */
+
 const enviarDadosFazenda = async (dadosFazenda) => {
   try {
     const response = await axios.post(apiUrl + "/fazendas", dadosFazenda, {
       headers: {
         "Content-Type": "application/json",
-        "api-key": apiKey, // Adicione seu cabeçalho da API, se necessário
+        "api-key": apiKey,
       },
     });
-
-    // Verifique a resposta da API
-    if (response.status === 200) {
-      Swal.fire({
-        icon: "success",
-        title: "Sucesso",
-        text: "Dados enviados com sucesso!",
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Erro",
-        text: "Não foi possível enviar os dados.",
-      });
-    }
+    return response.data; // Retorna os dados da resposta
   } catch (error) {
-    console.error("Erro ao enviar dados:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Erro",
-      text: "Ocorreu um erro ao enviar os dados. Tente novamente mais tarde.",
-    });
+    // Verifica o status da resposta para fornecer mensagens específicas
+    if (error.response) {
+      const { status } = error.response;
+      if (status === 400) {
+        throw new Error("Parece que algo está errado no seu formulário. Tem certeza que seu usuário é válido?");
+      } else if (status === 500) {
+        throw new Error("Erro no servidor. Por favor, tente novamente mais tarde.");
+      } else {
+        throw new Error(error.response?.data?.message || "Erro ao enviar os dados.");
+      }
+    } else {
+      throw new Error("Erro ao enviar os dados. Verifique sua conexão.");
+    }
   }
 };
 
-export default enviarDadosFazenda;
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
-const apiSecretKey = "secretApiKey";
+export default enviarDadosFazenda;
 
 export const fetchFarmDetails = async (id) => {
   try {
     const response = await axios.post(
-      `${apiBaseUrl}/fazendas/${id}`,
+      `${apiUrl}/fazendas/${id}`,
       {},
       {
         headers: {
@@ -92,7 +84,7 @@ export const updateFarm = async (id, fazenda) => {
   console.log(fazenda);
   try {
     const response = await axios.patch(
-      `${apiBaseUrl}/fazendas/${id}`,
+      `${apiUrl}/fazendas/${id}`,
       fazenda,
       {
         headers: {
@@ -111,7 +103,7 @@ export const updateFarm = async (id, fazenda) => {
 
 export const obterFazendas = async () => {
   try {
-    const response = await axios.get(apiBaseUrl + '/fazendas');
+    const response = await axios.get(apiUrl + '/fazendas');
     return response.data; 
   } catch (error) {
     console.error('Erro ao obter fazendas:', error);
@@ -121,7 +113,7 @@ export const obterFazendas = async () => {
 
 export const deletarFazenda = async (id, jwt) => {
   try {
-    await axios.delete(`${apiBaseUrl}/fazendas/${id}`, {
+    await axios.delete(`${apiUrl}/fazendas/${id}`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
