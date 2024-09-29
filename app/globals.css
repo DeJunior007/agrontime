@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "~@fortawesome/fontawesome-free/css/all.min.css";
 
 * {
   padding: 0;
@@ -16,3 +17,4 @@ body {
     text-wrap: balance;
   }
 }
+
