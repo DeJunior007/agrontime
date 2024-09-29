@@ -1,45 +1,60 @@
 [
   {
-    "id": "nomeCompleto",
+    "id": "nome",
     "label": "Nome Completo",
     "type": "text",
     "name": "nomeCompleto",
-    "validation": "required",
-    "icon": "fas fa-user"
+    "icon": "fa-solid fa-user"
   },
   {
-    "id": "documentoFiscal",
+    "id": "cpf",
     "label": "CPF",
     "type": "text",
     "name": "documentoFiscal",
-    "validation": "required",
-    "mask": "999.999.999-99",
-    "icon": "fas fa-id-card"
+    "icon": "fa-solid fa-id-card",
+    "mask": "999.999.999-99"
   },
   {
     "id": "email",
     "label": "E-mail",
     "type": "email",
     "name": "email",
-    "validation": "email",
-    "icon": "fas fa-envelope"
+    "icon": "fa-solid fa-envelope"
   },
   {
     "id": "senha",
     "label": "Senha",
     "type": "password",
     "name": "senha",
-    "validation": "password",
-    "icon": "fas fa-lock"
+    "icon": "fa-solid fa-lock"
+  },
+  {
+    "id": "tipo",
+    "label": "Cargo",
+    "type": "select",
+    "name": "tipo",
+    "validation": "required",
+    "options": [
+      { "value": "engenheiro agrônomo", "label": "Engenheiro Agrônomo" },
+      { "value": "técnico agricola", "label": "Técnico agricola" }
+    ],
+    "icon": "fa-solid fa-id-card"
   },
   {
     "id": "celular",
     "label": "Celular",
     "type": "text",
     "name": "celular",
-    "validation": "required",
-    "mask": "(99) 99999-9999",
-    "icon": "fas fa-phone"
+    "icon": "fa-solid fa-phone",
+    "mask": "(99) 99999-9999"
+  },
+  {
+    "id": "dataNascimento",
+    "label": "Data de Nascimento",
+    "type": "text",
+    "name": "dataNascimento",
+    "icon": "fa-solid fa-calendar",
+    "mask": "99/99/9999"
   },
   {
     "id": "genero",
@@ -53,14 +68,5 @@
       { "value": "O", "label": "Não Binário" }
     ],
     "icon": "fas fa-venus-mars"
-  },
-  {
-    "id": "dataNascimento",
-    "label": "Data de Nascimento",
-    "type": "text",
-    "name": "dataNascimento",
-    "validation": "required",
-    "mask": "99/99/9999",
-    "icon": "fas fa-calendar-alt"
   }
 ]

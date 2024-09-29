@@ -1,0 +1,75 @@
+[
+    {
+      "id": "nome",
+      "label": "Nome",
+      "type": "text",
+      "name": "nome",
+      "icon": "fa-solid fa-home"
+    },
+    {
+      "id": "nirf",
+      "label": "NIRF",
+      "type": "text",
+      "name": "nirf",
+      "icon": "fa-solid fa-id-card"
+      ,"mask": "9.999.999-9"
+    },
+    {
+      "id": "areaPropriedade",
+      "label": "Área da Propriedade (ha)",
+      "type": "number",
+      "name": "areaPropriedade",
+      "icon": "fa-solid fa-map"
+    },
+    {
+      "id": "cep",
+      "label": "CEP",
+      "type": "text",
+      "name": "cep",
+      "icon": "fa-solid fa-map-marker-alt",
+      "mask": "99999-999"
+    },
+    {
+      "id": "rua",
+      "label": "Rua",
+      "type": "text",
+      "name": "rua",
+      "icon": "fa-solid fa-road"
+    },
+    {
+      "id": "numero",
+      "label": "Número",
+      "type": "text",
+      "name": "numero",
+      "icon": "fa-solid fa-house"
+    },
+    {
+      "id": "complemento",
+      "label": "Complemento",
+      "type": "text",
+      "name": "complemento",
+      "icon": "fa-solid fa-address-card"
+    },
+    {
+      "id": "bairro",
+      "label": "Bairro",
+      "type": "text",
+      "name": "bairro",
+      "icon": "fa-solid fa-building"
+    },
+    {
+      "id": "cidade",
+      "label": "Cidade",
+      "type": "text",
+      "name": "cidade",
+      "icon": "fa-solid fa-city"
+    },
+    {
+      "id": "estado",
+      "label": "Estado",
+      "type": "text",
+      "name": "estado",
+      "icon": "fa-solid fa-flag"
+    }
+  ]
+  

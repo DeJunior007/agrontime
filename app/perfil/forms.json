@@ -1,0 +1,67 @@
+[
+    {
+      "id": "nomeCompleto",
+      "label": "Nome Completo",
+      "type": "text",
+      "name": "nomeCompleto",
+      "validation": "required",
+      "icon": "fas fa-user"
+    },
+    {
+      "id": "documentoFiscal",
+      "label": "CPF",
+      "type": "text",
+      "name": "documentoFiscal",
+      "validation": "required",
+      "icon": "fas fa-file",
+      "mask": "999.999.999-99"
+    },
+    {
+      "id": "email",
+      "label": "E-mail",
+      "type": "email",
+      "name": "email",
+      "validation": "required|email",
+      "icon": "fas fa-envelope"
+    },
+    {
+      "id": "genero",
+      "label": "Gênero",
+      "type": "select",
+      "name": "genero",
+      "options": [
+        { "value": "Masculino", "label": "Masculino" },
+        { "value": "Feminino", "label": "Feminino" },
+        { "value": "Outro", "label": "Outro" }
+      ],
+      "validation": "required",
+      "icon": "fas fa-venus-mars"
+    },
+    {
+      "id": "senha",
+      "label": "Senha",
+      "type": "password",
+      "name": "senha",
+      "validation": "required|min:6",
+      "icon": "fas fa-lock"
+    },
+    {
+      "id": "dataNascimento",
+      "label": "Data de Nascimento",
+      "type": "text",
+      "name": "dataNascimento",
+      "validation": "required",
+      "mask": "99/99/9999",
+      "icon": "fas fa-calendar-alt"
+    },
+    {
+      "id": "celular",
+      "label": "Celular",
+      "type": "text",
+      "name": "celular",
+      "validation": "required",
+      "mask": "(99) 99999-9999",
+      "icon": "fas fa-phone"
+    }
+  ]
+  

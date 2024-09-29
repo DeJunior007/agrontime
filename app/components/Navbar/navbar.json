@@ -1,19 +1,27 @@
 {
-    "cargos": {
-      "master": {
-        "fazenda": [
-          { "label": "Criar Fazenda", "href": "/manterfazenda" },
-          { "label": "Gerenciar Fazenda", "href": "/visualizarfazendas" }
-        ],
-        "cultura": [
-          { "label": "Criar Cultura", "href": "/mantercultura" },
-          { "label": "Gerenciar Cultura", "href": "/visualizarcultura" }
-        ],
-        "funcionario": [
-          { "label": "Criar Funcionário", "href": "/manterusuario" },
-          { "label": "Gerenciar Funcionário", "href": "/visualizarusuarios" }
+  "cargos": {
+    "master": [
+      {
+        "category": "Fazenda",
+        "options": [
+          { "label": "Criar Fazenda", "href": "/manterfazenda", "icon": "fas fa-tree" },
+          { "label": "Gerenciar Fazenda", "href": "/visualizarfazendas", "icon": "fas fa-home" }
+        ]
+      },
+      {
+        "category": "Cultura",
+        "options": [
+          { "label": "Criar Cultura", "href": "/mantercultura", "icon": "fas fa-seedling" },
+          { "label": "Gerenciar Cultura", "href": "/visualizarcultura", "icon": "fas fa-carrot" }
+        ]
+      },
+      {
+        "category": "Funcionário",
+        "options": [
+          { "label": "Criar Funcionário", "href": "/manterusuario", "icon": "fas fa-user" },
+          { "label": "Gerenciar Funcionário", "href": "/visualizarusuarios", "icon": "fas fa-users" }
         ]
       }
-    }
+    ]
   }
-  
+}
