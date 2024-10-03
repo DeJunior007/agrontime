@@ -37,8 +37,11 @@ export default function PhraseYe({ hideOnMobile = false }) {
   }, []);
 
   return (
-    <p className={`text-white ${hideOnMobile ? 'hidden sm:block font-semibold text-4xl md:max-w-[100%]' : 'md:max-w-[80%] sm:hidden mt-10 font-light text-center'}`}>
-      {greeting} {quote}
-    </p>
+    <div className={`flex justify-center items-center ${hideOnMobile ? 'hidden sm:flex' : 'flex'}`}>
+      <p className={`text-white ${hideOnMobile ? 'font-semibold text-2xl lg:text-3xl text-start md:max-w-[60%] lg:max-w-[75%] xl:max-w-ful' : 'mt-10 font-light text-center max-w-[80%] sm:hidden'}`}>
+        {greeting} {quote}
+      </p>
+    </div>
   );
+  
 }

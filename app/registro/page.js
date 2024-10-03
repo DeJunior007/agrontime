@@ -15,7 +15,7 @@ const ManterUsuario = () => {
     email: "",
     senha: "",
     celular: "",
-    genero: "M", // Gênero masculino como padrão
+    genero: "M",
     dataNascimento: "",
   });
 
@@ -102,7 +102,7 @@ const ManterUsuario = () => {
         email: "",
         senha: "",
         celular: "",
-        genero: "M", 
+        genero: "M",
         dataNascimento: "",
       });
     } catch (error) {
@@ -111,12 +111,12 @@ const ManterUsuario = () => {
   };
 
   return (
-    <section className="flex flex-col items-center min-h-screen bg-purple-900 p-8">
-      <div className="container mt-10 p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold text-center mb-6">
+    <section className="flex flex-col items-center min-h-screen p-8">
+      <div className="w-full max-w-4xl mt-10 p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6">
           Cadastro de Usuário
         </h1>
-        <p className="text-lg text-gray-700 text-center mb-4">
+        <p className="text-sm md:text-lg text-gray-700 text-center mb-4">
           Preencha os campos abaixo para criar uma conta e gerenciar sua fazenda de forma eficiente.
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -124,7 +124,7 @@ const ManterUsuario = () => {
             {inputFields.map((field, index) => (
               <div key={index} className="form-group flex flex-col">
                 <div className="flex items-center mb-1">
-                  <i className={`${field.icon} text-gray-500 mr-2`}></i> {/* Ícone aqui */}
+                  <i className={`${field.icon} text-gray-500 mr-2`}></i>
                   <Input
                     id={field.id}
                     type={field.type}

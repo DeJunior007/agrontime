@@ -76,7 +76,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="bg-white max-w-[800px] lg:p-10 p-5 w-[90%] lg:w-full shadow-2xl rounded-2xl">
+    <div className="bg-white max-w-[800px] lg:p-10 p-5 w-full lg:w-full shadow-2xl rounded-2xl">
       {loading ? ( // Exibe o componente Loading se estiver carregando
         <Loading />
       ) : (

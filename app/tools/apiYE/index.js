@@ -1,16 +1,13 @@
+import frases from "../../utils/array/frases.json";
+
 async function apiYE() {
-    try {
-      const response = await fetch('https://api.kanye.rest/');
-      if (!response.ok) {
-        throw new Error('Erro ao recuperar citação de Kanye West');
-      }
-      const data = await response.json();
-      return data.quote; 
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+  try {
+    // Simulando uma espera como se estivesse chamando uma API externa
+    const randomIndex = Math.floor(Math.random() * frases.frases.length);
+    return frases.frases[randomIndex];
+  } catch (error) {
+    return "que o campo responda à dedicação com uma colheita abundante.";
   }
-  
-  export { apiYE };
-  
+}
+
+export { apiYE };
