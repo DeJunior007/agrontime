@@ -18,44 +18,44 @@ export const getJWTFromCookie = () => {
   return jwt;
 };
 
-export const buscarUsuarioPorEmail = async (jwt) => {
+export const buscarUsuarioPorEmail = async () => {
   try {
-    const email = decodeJWT(jwt).email;
+    // Obtém o email do sessionStorage
+    const email = sessionStorage.getItem("email");
+
     const response = await axios.post(
       `${apiBaseUrl}/usuarios/busca-por-email`,
-      { email },
+      { email }, // Enviando o email salvo no sessionStorage
       {
         headers: {
-          "api-key": apiSecretKey,
           "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
         },
       }
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
     throw new Error("Erro ao buscar usuário: " + error.message);
   }
 };
 
-export const atualizarUsuario = async (usuario, jwt) => {
-
-  // Criando uma cópia do objeto para não modificar o original
-  const usuarioParaAtualizar = { ...usuario };
-
-  // Removendo as propriedades `criadoEm` e `status`
-  delete usuarioParaAtualizar.criadoEm;
-  delete usuarioParaAtualizar.status;
-
+// Função para atualizar as informações do usuário
+export const atualizarUsuario = async (usuario) => {
   try {
     await axios.put(
-      `${apiBaseUrl}/usuarios/altera-informacoes-proprietario/` + usuario.idUsuario,
-      usuarioParaAtualizar,
+      `${apiBaseUrl}/usuarios/altera-informacoes-proprietario/${usuario.idUsuario}`,
+      {
+        idUsuario: usuario.idUsuario,
+        nomeCompleto: usuario.nomeCompleto,
+        documentoFiscal: usuario.documentoFiscal,
+        email: usuario.email,
+        genero: usuario.genero,
+        senha: usuario.senha,
+        dataNascimento: usuario.dataNascimento,
+        celular: usuario.celular,
+      },
       {
         headers: {
-          "api-key": apiSecretKey,
           "Content-Type": "application/json",
-          Authorization: `Bearer ${jwt}`,
         },
       }
     );

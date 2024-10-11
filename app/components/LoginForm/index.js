@@ -65,13 +65,13 @@ export default function LoginForm() {
     }
 
     setLoading(true); // Ativa o loading
-
     try {
       await authLogin(formData.email, formData.password);
+      sessionStorage.setItem("email", formData.email);
     } catch (error) {
       console.error("Erro durante o login:", error);
     } finally {
-      setLoading(false); // Desativa o loading
+      setLoading(false);
     }
   };
 
