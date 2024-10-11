@@ -1,0 +1,240 @@
+{
+    "dados": {
+      "solo": {
+        "tipoSolo": {
+          "id": "tipoSolo",
+          "label": "Tipo de Solo",
+          "type": "select",
+          "options": [
+            { "value": "SOLO_ARGILOSO", "label": "Solo Argiloso" },
+            { "value": "SOLO_ARENOSO", "label": "Solo Arenoso" },
+            { "value": "SOLO_SILTEOSO", "label": "Solo Silteoso" },
+            { "value": "SOLO_FRANCO", "label": "Solo Franco" },
+            { "value": "SOLO_ORGANICO", "label": "Solo Orgânico" },
+            { "value": "SOLO_ALUVIAL", "label": "Solo Aluvial" },
+            { "value": "SOLO_PODZOLICO", "label": "Solo Pódzolico" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-seedling "
+        },
+        "composicao": {
+          "id": "composicao",
+          "label": "Composição",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-flask"
+        },
+        "phSolo": {
+          "id": "phSolo",
+          "label": "pH do Solo",
+          "type": "select",
+          "options": [
+            { "value": "ACIDO", "label": "Ácido" },
+            { "value": "NEUTRO", "label": "Neutro" },
+            { "value": "ALCALINO", "label": "Alcalino" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-water"
+        },
+        "capacidadeRetencao": {
+          "id": "capacidadeRetencao",
+          "label": "Capacidade de Retenção",
+          "type": "select",
+          "options": [
+            { "value": "BAIXA", "label": "Baixa" },
+            { "value": "MEDIA", "label": "Média" },
+            { "value": "ALTA", "label": "Alta" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-tint"
+        },
+        "fertilidade": {
+          "id": "fertilidade",
+          "label": "Fertilidade",
+          "type": "select",
+          "options": [
+            { "value": "BAIXA", "label": "Baixa" },
+            { "value": "MEDIA", "label": "Média" },
+            { "value": "ALTA", "label": "Alta" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-seedling"
+        },
+        "erosao": {
+          "id": "erosao",
+          "label": "Erosão",
+          "type": "select",
+          "options": [
+            { "value": "RISCO_BAIXO", "label": "Risco Baixo" },
+            { "value": "RISCO_ALTO", "label": "Risco Alto" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-water"
+        }
+      },
+      "semente": {
+        "nome": {
+          "id": "nome",
+          "label": "Nome da Semente",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-seedling"
+        },
+        "tipo": {
+          "id": "tipo",
+          "label": "Tipo",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-tag"
+        },
+        "especie": {
+          "id": "especie",
+          "label": "Espécie",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-tree"
+        }
+      },
+      "colheita": {
+        "peso": {
+          "id": "peso",
+          "label": "Peso",
+          "type": "number",
+          "mask": "99999", 
+          "validation": "required",
+          "icon": "fas fa-weight"
+        },
+        "valorEstimado": {
+          "id": "valorEstimado",
+          "label": "Valor Estimado",
+          "type": "number",
+          "mask": "99999", 
+          "validation": "required",
+          "icon": "fas fa-dollar-sign"
+        },
+        "qualidade": {
+          "id": "qualidade",
+          "label": "Qualidade",
+          "type": "select",
+          "options": [
+            { "value": "OTIMA", "label": "Ótima" },
+            { "value": "BOA", "label": "Boa" },
+            { "value": "REGULAR", "label": "Regular" },
+            { "value": "RUIM", "label": "Ruim" },
+            { "value": "PESSIMA", "label": "Péssima" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-star"
+        },
+        "dataColheita": {
+          "id": "dataColheita",
+          "label": "Data da Colheita",
+          "type": "date",
+          "mask": "99/99/9999", 
+          "validation": "required",
+          "icon": "fas fa-calendar"
+        },
+        "idCultivo": {
+          "id": "idCultivo",
+          "label": "ID do Cultivo",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-leaf"
+        },
+        "qtdSacas": {
+          "id": "qtdSacas",
+          "label": "Quantidade de Sacas",
+          "type": "number",
+          "mask": "99", 
+          "validation": "required",
+          "icon": "fas fa-box"
+        }
+      },
+      "cultivo": {
+        "idSolo": {
+          "id": "idSolo",
+          "label": "ID do Solo",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-soil"
+        },
+        "idSafra": {
+          "id": "idSafra",
+          "label": "ID da Safra",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-flag"
+        },
+        "idSemente": {
+          "id": "idSemente",
+          "label": "ID da Semente",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-seedling"
+        },
+        "nome": {
+          "id": "nome",
+          "label": "Nome do Cultivo",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-leaf"
+        },
+        "areaTotal": {
+          "id": "areaTotal",
+          "label": "Área Total",
+          "type": "number",
+          "mask": "99999", 
+          "validation": "required",
+          "icon": "fas fa-map"
+        },
+        "dataPlantio": {
+          "id": "dataPlantio",
+          "label": "Data do Plantio",
+          "type": "date",
+          "mask": "99/99/9999", 
+          "validation": "required",
+          "icon": "fas fa-calendar"
+        }
+      },
+      "safra": {
+        "idFazenda": {
+          "id": "idFazenda",
+          "label": "ID da Fazenda",
+          "type": "text",
+          "validation": "required",
+          "icon": "fas fa-building"
+        },
+        "status": {
+          "id": "status",
+          "label": "Status",
+          "type": "select",
+          "options": [
+            { "value": "PLANTANDO", "label": "Plantando" },
+            { "value": "ADUBANDO", "label": "Adubando" },
+            { "value": "GERMINANDO", "label": "Germinando" },
+            { "value": "COLHENDO", "label": "Colhendo" },
+            { "value": "CONCLUIDO", "label": "Concluído" }
+          ],
+          "validation": "required",
+          "icon": "fas fa-flag"
+        },
+        "dataInicio": {
+          "id": "dataInicio",
+          "label": "Data de Início",
+          "type": "date",
+          "mask": "99/99/9999", 
+          "validation": "required",
+          "icon": "fas fa-calendar"
+        },
+        "dataFim": {
+          "id": "dataFim",
+          "label": "Data de Fim",
+          "type": "date",
+          "mask": "99/99/9999", 
+          "validation": "required",
+          "icon": "fas fa-calendar"
+        }
+      }
+    }
+  }
+  
