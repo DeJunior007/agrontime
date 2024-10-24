@@ -1,20 +1,23 @@
-'use client'
+'use client';
 
 import { useEffect, useState } from 'react';
 import Navbar from '@/app/components/Navbar';
 import Swal from 'sweetalert2';
 import { useForm } from 'react-hook-form';
-import { fetchFarmDetails, fetchViaCEP, updateFarm } from '@/app/api/gerenciarFazendaApi';
+import { fetchFarmDetails, updateFarm } from '@/app/api/gerenciarFazendaApi';
+import Input from '@/app/components/Input.js';
+import Loading from '@/app/components/Loading';
 
 const FarmDetailPage = () => {
-  const [farm, setFarm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [fazenda, setFazenda] = useState({
+    idFazenda: null,
+    idUsuario: null,
     nome: '',
     nirf: '',
     areaPropriedade: 0,
-    qtdFuncionarios: 0,
     endereco: {
+      idEndereco: null,
       cep: '',
       rua: '',
       numero: '',
@@ -25,62 +28,63 @@ const FarmDetailPage = () => {
     }
   });
 
-  const { register, handleSubmit, setValue, watch } = useForm();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
 
   useEffect(() => {
     const fetchFarm = async () => {
       try {
+        setLoading(true);
         const url = window.location.href;
         const match = url.match(/\/gerenciar-fazenda\/(\d+)/);
         if (!match) {
           Swal.fire({
             icon: 'error',
-            title: 'Erro ao buscar detalhes da fazenda',
+            title: 'Erro',
             text: 'ID não encontrado na URL',
           });
           return;
         }
-        
+
         const id = match[1];
-        
         const farmData = await fetchFarmDetails(id);
-        setFarm(farmData);
 
         setFazenda({
+          idFazenda: farmData.idFazenda,
+          idUsuario: farmData.idUsuario,
           nome: farmData.nome,
           nirf: farmData.nirf,
           areaPropriedade: farmData.areaPropriedade,
-          qtdFuncionarios: farmData.qtdFuncionarios,
           endereco: {
-            cep: farmData.EnderecoFazenda.cep,
-            rua: farmData.EnderecoFazenda.rua,
-            numero: farmData.EnderecoFazenda.numero,
-            complemento: farmData.EnderecoFazenda.complemento,
-            bairro: farmData.EnderecoFazenda.bairro,
-            cidade: farmData.EnderecoFazenda.cidade,
-            estado: farmData.EnderecoFazenda.estado
+            idEndereco: farmData.EnderecoFazenda?.idEndereco || null,
+            cep: farmData.EnderecoFazenda?.cep || '',
+            rua: farmData.EnderecoFazenda?.rua || '',
+            numero: farmData.EnderecoFazenda?.numero || '',
+            complemento: farmData.EnderecoFazenda?.complemento || '',
+            bairro: farmData.EnderecoFazenda?.bairro || '',
+            cidade: farmData.EnderecoFazenda?.cidade || '',
+            estado: farmData.EnderecoFazenda?.estado || ''
           }
         });
 
         setValue('nome', farmData.nome);
         setValue('nirf', farmData.nirf);
         setValue('areaPropriedade', farmData.areaPropriedade);
-        setValue('qtdFuncionarios', farmData.qtdFuncionarios);
-        setValue('cep', farmData.EnderecoFazenda.cep);
-        setValue('rua', farmData.EnderecoFazenda.rua);
-        setValue('numero', farmData.EnderecoFazenda.numero);
-        setValue('complemento', farmData.EnderecoFazenda.complemento);
-        setValue('bairro', farmData.EnderecoFazenda.bairro);
-        setValue('cidade', farmData.EnderecoFazenda.cidade);
-        setValue('estado', farmData.EnderecoFazenda.estado);
+        setValue('cep', farmData.EnderecoFazenda?.cep || '');
+        setValue('rua', farmData.EnderecoFazenda?.rua || '');
+        setValue('numero', farmData.EnderecoFazenda?.numero || '');
+        setValue('complemento', farmData.EnderecoFazenda?.complemento || '');
+        setValue('bairro', farmData.EnderecoFazenda?.bairro || '');
+        setValue('cidade', farmData.EnderecoFazenda?.cidade || '');
+        setValue('estado', farmData.EnderecoFazenda?.estado || '');
 
-        setLoading(false);
       } catch (error) {
         Swal.fire({
           icon: 'error',
-          title: 'Erro ao buscar detalhes da fazenda',
-          text: error.message,
+          title: 'Erro ao buscar dados',
+          text: error.message || 'Não foi possível carregar os dados da fazenda.',
         });
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -89,10 +93,7 @@ const FarmDetailPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (
-      name === "areaPropriedade" ||
-      name === "qtdFuncionarios"
-    ) {
+    if (name === "areaPropriedade") {
       setFazenda((prevFazenda) => ({
         ...prevFazenda,
         [name]: parseInt(value, 10),
@@ -116,63 +117,23 @@ const FarmDetailPage = () => {
 
   const onSubmit = async () => {
     try {
-      const url = window.location.href;
-      const match = url.match(/\/gerenciar-fazenda\/(\d+)/);
-      if (!match) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erro ao atualizar fazenda',
-          text: 'ID não encontrado na URL',
-        });
-        return;
-      }
-      
-      const id = match[1];
+      const id = fazenda.idFazenda;
+      delete fazenda.idFazenda;
       
       await updateFarm(id, fazenda);
-
+      
+      fazenda.idFazenda = id;
       Swal.fire({
         icon: 'success',
-        title: 'Fazenda atualizada com sucesso',
-        text: 'Os dados da fazenda foram atualizados com sucesso!',
+        title: 'Sucesso',
+        text: 'Fazenda atualizada com sucesso!',
       });
 
-      // Atualizar os detalhes da fazenda após a atualização
-      const updatedFarmData = await fetchFarmDetails(id);
-      setFarm(updatedFarmData);
     } catch (error) {
       Swal.fire({
         icon: 'error',
-        title: 'Erro ao atualizar fazenda',
-        text: 'Preencha todos os campos corretamente',
-      });
-    }
-  };
-
-  const fetchCepData = async (cep) => {
-    try {
-      const cepData = await fetchViaCEP(cep);
-      setFazenda((prevFazenda) => ({
-        ...prevFazenda,
-        endereco: {
-          ...prevFazenda.endereco,
-          rua: cepData.rua,
-          complemento: cepData.complemento,
-          bairro: cepData.bairro,
-          cidade: cepData.cidade,
-          estado: cepData.estado,
-        },
-      }));
-      setValue('rua', cepData.rua);
-      setValue('complemento', cepData.complemento);
-      setValue('bairro', cepData.bairro);
-      setValue('cidade', cepData.cidade);
-      setValue('estado', cepData.estado);
-    } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'CEP não encontrado',
-        text: error.message,
+        title: 'Erro',
+        text: 'Erro ao atualizar fazenda. Verifique os campos e tente novamente.',
       });
     }
   };
@@ -180,69 +141,147 @@ const FarmDetailPage = () => {
   return (
     <main>
       <Navbar />
-      <section className="mx-auto block h-auto p-4">
-        <h1 className="text-2xl font-bold text-slate-100 px-4 py-2 mb-2 rounded-lg shadow-lg bg-[#053027]">Detalhes da Fazenda</h1>
+      <section className="mx-auto p-6 bg-white h-screen flex flex-col items-center justify-start">
+      <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
+        Detalhes da Fazenda</h1>
         {loading ? (
-          <div className="text-center">Carregando...</div>
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8">
+            <h1 className="text-4xl font-bold text-center text-primary mb-4">
+              Carregando...
+            </h1>
+            <Loading />
+          </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded shadow-md w-full mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="mb-4">
-              <label className="block text-gray-700">Nome:</label>
-              <input {...register('nome')} name="nome" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+          <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded shadow-xl w-full max-w-[50vw] grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="flex items-center">
+              <i className="fas fa-id-card text-gray-500 mr-2"></i>
+              <Input
+                id="nome"
+                type="text"
+                label="Nome"
+                value={fazenda.nome}
+                onChange={handleChange}
+                name="nome"
+                error={errors.nome}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">NIRF:</label>
-              <input {...register('nirf')} name="nirf" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-id-card text-gray-500 mr-2"></i>
+              <Input
+                id="nirf"
+                type="text"
+                label="NIRF"
+                value={fazenda.nirf}
+                onChange={handleChange}
+                name="nirf"
+                error={errors.nirf}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Área da Propriedade:</label>
-              <input type="number" {...register('areaPropriedade')} name="areaPropriedade" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-chart-area text-gray-500 mr-2"></i>
+              <Input
+                id="areaPropriedade"
+                type="number"
+                label="Área da Propriedade"
+                value={fazenda.areaPropriedade}
+                onChange={handleChange}
+                name="areaPropriedade"
+                error={errors.areaPropriedade}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Quantidade de Funcionários:</label>
-              <input type="number" {...register('qtdFuncionarios')} name="qtdFuncionarios" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+  
+            <div className="col-span-2 font-semibold text-lg">Endereço</div>
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="cep"
+                type="text"
+                label="CEP"
+                value={fazenda.endereco.cep}
+                onChange={handleChange}
+                name="endereco.cep"
+                error={errors.endereco?.cep}
+              />
             </div>
-            <div className="col-span-2 mb-4">
-              <h2 className='font-semibold text-lg'>Endereço</h2>
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="rua"
+                type="text"
+                label="Rua"
+                value={fazenda.endereco.rua}
+                onChange={handleChange}
+                name="endereco.rua"
+                error={errors.endereco?.rua}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">CEP:</label>
-              <input {...register('cep')} name="endereco.cep" className="w-full p-2 border border-gray-300 rounded mt-2" onBlur={(e) => fetchCepData(e.target.value)} onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="numero"
+                type="text"
+                label="Número"
+                value={fazenda.endereco.numero}
+                onChange={handleChange}
+                name="endereco.numero"
+                error={errors.endereco?.numero}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Rua:</label>
-              <input {...register('rua')} name="endereco.rua" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="complemento"
+                type="text"
+                label="Complemento"
+                value={fazenda.endereco.complemento}
+                onChange={handleChange}
+                name="endereco.complemento"
+                error={errors.endereco?.complemento}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Número:</label>
-              <input {...register('numero')} name="endereco.numero" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="bairro"
+                type="text"
+                label="Bairro"
+                value={fazenda.endereco.bairro}
+                onChange={handleChange}
+                name="endereco.bairro"
+                error={errors.endereco?.bairro}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Complemento:</label>
-              <input {...register('complemento')} name="endereco.complemento" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="cidade"
+                type="text"
+                label="Cidade"
+                value={fazenda.endereco.cidade}
+                onChange={handleChange}
+                name="endereco.cidade"
+                error={errors.endereco?.cidade}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Bairro:</label>
-              <input {...register('bairro')} name="endereco.bairro" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
+            <div className="flex items-center">
+              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
+              <Input
+                id="estado"
+                type="text"
+                label="Estado"
+                value={fazenda.endereco.estado}
+                onChange={handleChange}
+                name="endereco.estado"
+                error={errors.endereco?.estado}
+              />
             </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Cidade:</label>
-              <input {...register('cidade')} name="endereco.cidade" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Estado:</label>
-              <input {...register('estado')} name="endereco.estado" className="w-full p-2 border border-gray-300 rounded mt-2" onChange={handleChange} />
-            </div>
-            <div className="col-span-2">
-              <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Atualizar Fazenda
+            <div className="col-span-2 flex justify-end">
+              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Atualizar
               </button>
             </div>
           </form>
         )}
-        <pre className="bg-gray-100 p-4 rounded overflow-x-auto mt-4">
-          {JSON.stringify(fazenda, null, 2)}
-        </pre>
       </section>
     </main>
   );

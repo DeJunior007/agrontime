@@ -46,7 +46,6 @@ export const fetchFarmDetails = async (id) => {
       {},
       {
         headers: {
-          "api-key": apiSecretKey,
           "Content-Type": "application/json",
         },
       }
@@ -88,7 +87,6 @@ export const updateFarm = async (id, fazenda) => {
       fazenda,
       {
         headers: {
-          "api-key": apiSecretKey,
           "Content-Type": "application/json",
         },
       }

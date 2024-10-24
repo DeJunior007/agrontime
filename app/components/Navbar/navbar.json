@@ -11,15 +11,12 @@
       {
         "category": "Cultura",
         "options": [
-          { "label": "Criar Cultura", "href": "/mantercultura", "icon": "fas fa-seedling" },
-          { "label": "Gerenciar Cultura", "href": "/visualizarcultura", "icon": "fas fa-carrot" }
-        ]
+          { "label": "Criar Cultura", "href": "/mantercultura", "icon": "fas fa-seedling" }        ]
       },
       {
         "category": "Funcionário",
         "options": [
-          { "label": "Criar Funcionário", "href": "/manterusuario", "icon": "fas fa-user" },
-          { "label": "Gerenciar Funcionário", "href": "/visualizarfuncionarios", "icon": "fas fa-users" }
+          { "label": "Criar Funcionário", "href": "/manterusuario", "icon": "fas fa-user" }
         ]
       }
     ]

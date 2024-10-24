@@ -29,9 +29,9 @@
           "label": "pH do Solo",
           "type": "select",
           "options": [
-            { "value": "ACIDO", "label": "Ácido" },
-            { "value": "NEUTRO", "label": "Neutro" },
-            { "value": "ALCALINO", "label": "Alcalino" }
+            { "value": "acido", "label": "Ácido" },
+            { "value": "neutro", "label": "Neutro" },
+            { "value": "alcalino", "label": "Alcalino" }
           ],
           "validation": "required",
           "icon": "fas fa-water"
@@ -41,9 +41,9 @@
           "label": "Capacidade de Retenção",
           "type": "select",
           "options": [
-            { "value": "BAIXA", "label": "Baixa" },
-            { "value": "MEDIA", "label": "Média" },
-            { "value": "ALTA", "label": "Alta" }
+            { "value": "baixa", "label": "Baixa" },
+            { "value": "media", "label": "Média" },
+            { "value": "alta", "label": "Alta" }
           ],
           "validation": "required",
           "icon": "fas fa-tint"
@@ -53,9 +53,9 @@
           "label": "Fertilidade",
           "type": "select",
           "options": [
-            { "value": "BAIXA", "label": "Baixa" },
-            { "value": "MEDIA", "label": "Média" },
-            { "value": "ALTA", "label": "Alta" }
+            { "value": "baixa", "label": "Baixa" },
+            { "value": "media", "label": "Média" },
+            { "value": "alta", "label": "Alta" }
           ],
           "validation": "required",
           "icon": "fas fa-seedling"
@@ -65,8 +65,8 @@
           "label": "Erosão",
           "type": "select",
           "options": [
-            { "value": "RISCO_BAIXO", "label": "Risco Baixo" },
-            { "value": "RISCO_ALTO", "label": "Risco Alto" }
+            { "value": "risco baixo", "label": "Risco Baixo" },
+            { "value": "risco alto", "label": "Risco Alto" }
           ],
           "validation": "required",
           "icon": "fas fa-water"

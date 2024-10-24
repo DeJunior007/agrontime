@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Input from "../components/Input.js";
 import Loading from "../components/Loading";
-import formsConfig from "./forms.json";
+import { obterJson } from "./newforms";
 import { criarSolo, criarSemente, criarColheita, criarCultivo, criarSafra } from "../api/culturasAPi"; 
 import Modal from "../components/Modal";
 
@@ -15,9 +15,22 @@ const CriarCultura = () => {
   const [activeTab, setActiveTab] = useState("solo");
   const [modalMessage, setModalMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formsConfig, setFormsConfig] = useState(null); // Inicializando com null ou um objeto vazio
 
   useEffect(() => {
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const jsonData = await obterJson(); // Aguardando a promise ser resolvida
+        console.log('Dados obtidos do formsConfig:', jsonData); // Verificando o retorno
+        setFormsConfig(jsonData); // Atualizando formsConfig com os dados obtidos
+      } catch (error) {
+        console.error("Erro ao obter dados do formulário:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const handleChange = (e) => {
@@ -27,7 +40,7 @@ const CriarCultura = () => {
       [name]: value,
     }));
   };
-
+  
   const renderFormFields = (fields) => {
     return Object.values(fields).map((field) => (
       <div key={field.id} className="form-group flex flex-col mb-4">
