@@ -1,16 +1,20 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion"; // Importando Framer Motion
+import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
-import Input from "../components/Input.js/index.js";
+import Input from "../components/Input.js";
 import Loading from "../components/Loading";
 import formsConfig from "./forms.json";
+import { criarSolo, criarSemente, criarColheita, criarCultivo, criarSafra } from "../api/culturasAPi"; 
+import Modal from "../components/Modal";
 
 const CriarCultura = () => {
   const [cultura, setCultura] = useState({});
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("solo");
+  const [modalMessage, setModalMessage] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setLoading(false);
@@ -52,29 +56,95 @@ const CriarCultura = () => {
     setActiveTab(tab);
   };
 
+  const handleSubmit = async (data, apiFunction) => {
+    try {
+      const response = await apiFunction(data);
+      console.log('Resposta da API:', response);
+      const { statusCode, message } = response.data || {};
+      
+      if (!statusCode || (statusCode !== 200 && statusCode !== 201)) {
+        console.log('Erro no statusCode:', statusCode);
+        setModalMessage({
+          message: message || "Ocorreu um erro ao adicionar a entidade.",
+          entity: "",
+          isError: true,
+        });
+      } else {
+        console.log('Operação bem-sucedida:', response.data);
+        setModalMessage({
+          message: message || "Operação realizada com sucesso.",
+          entity: response.data.nome || "Entidade",
+          isError: false,
+        });
+      }
+      setIsModalOpen(true);
+    } catch (error) {
+            console.error('Erro ao executar a função:', error); // Debug: erro na execução
+
+      console.error('Erro ao executar a função:', error); // Debug: erro na execução
+      console.error('Dados do erro:', error.response?.data); // Mostrando dados do erro
+      console.error('Mensagem de erro:', error.message); // Mensagem de erro geral
+  
+      setModalMessage({
+        message: error.response?.data?.message || "Ocorreu um erro ao adicionar a entidade.",
+        entity: "",
+        isError: true,
+      });
+      setIsModalOpen(true);
+    }
+  };
+  
+  
+  
+
   const handleSubmitSolo = () => {
-    console.log("Conteúdo do solo:", cultura);
-    alert("Ainda não está pronto");
+    const soloData = Object.keys(formsConfig.dados.solo).reduce((acc, key) => {
+      if (key in cultura) {
+        acc[key] = cultura[key];
+      }
+      return acc;
+    }, {});
+    handleSubmit(soloData, criarSolo);
   };
 
   const handleSubmitSemente = () => {
-    console.log("Conteúdo da semente:", cultura);
-    alert("Ainda não está pronto");
+    const sementeData = Object.keys(formsConfig.dados.semente).reduce((acc, key) => {
+      if (key in cultura) {
+        acc[key] = cultura[key];
+      }
+      return acc;
+    }, {});
+    handleSubmit(sementeData, criarSemente);
   };
 
   const handleSubmitColheita = () => {
-    console.log("Conteúdo da colheita:", cultura);
-    alert("Ainda não está pronto");
+    const colheitaData = Object.keys(formsConfig.dados.colheita).reduce((acc, key) => {
+      if (key in cultura) {
+        acc[key] = cultura[key];
+      }
+      return acc;
+    }, {});
+    handleSubmit(colheitaData, criarColheita);
   };
 
   const handleSubmitCultivo = () => {
-    console.log("Conteúdo do cultivo:", cultura);
-    alert("Ainda não está pronto");
+    const cultivoData = Object.keys(formsConfig.dados.cultivo).reduce((acc, key) => {
+      if (key in cultura) {
+        acc[key] = cultura[key];
+      }
+      return acc;
+    }, {});
+    handleSubmit(cultivoData, criarCultivo);
   };
 
   const handleSubmitSafra = () => {
-    console.log("Conteúdo da safra:", cultura);
-    alert("Ainda não está pronto");
+    const safraData = Object.keys(formsConfig.dados.safra).reduce((acc, key) => {
+      if (key in cultura) {
+        acc[key] = cultura[key];
+      }
+      return acc;
+    }, {});
+    handleSubmit(safraData, criarSafra);
   };
 
   if (loading) {
@@ -93,7 +163,7 @@ const CriarCultura = () => {
                 key={tab}
                 onClick={() => handleTabChange(tab)}
                 className={`p-2 w-full relative ${activeTab === tab ? "bg-primary text-white" : "bg-white"} transition-colors duration-300 ${index === 0 ? "rounded-tl-md rounded-bl-md" : index === 4 ? "rounded-tr-md rounded-br-md" : ""}`}
-                whileTap={{ scale: 0.95 }} // Animação de clique
+                whileTap={{ scale: 0.95 }}
               >
                 <i className={`fas fa-${tab === "solo" ? "tree" : tab === "semente" ? "seedling" : tab === "colheita" ? "tractor" : tab === "cultivo" ? "leaf" : "flag"} mr-2`}></i>
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -107,7 +177,7 @@ const CriarCultura = () => {
             ))}
           </div>
           <motion.div
-            layout // Usar layout para animação suave ao mudar as abas
+            layout
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -50 }}
@@ -140,6 +210,7 @@ const CriarCultura = () => {
           </motion.div>
         </div>
       </main>
+      {isModalOpen && <Modal message={modalMessage.message} onClose={() => setIsModalOpen(false)} />}
     </>
   );
 };

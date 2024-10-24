@@ -19,7 +19,7 @@
         "category": "Funcionário",
         "options": [
           { "label": "Criar Funcionário", "href": "/manterusuario", "icon": "fas fa-user" },
-          { "label": "Gerenciar Funcionário", "href": "/visualizarusuarios", "icon": "fas fa-users" }
+          { "label": "Gerenciar Funcionário", "href": "/visualizarfuncionarios", "icon": "fas fa-users" }
         ]
       }
     ]
