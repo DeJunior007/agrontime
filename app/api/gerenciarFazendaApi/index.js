@@ -121,3 +121,54 @@ export const deletarFazenda = async (id, jwt) => {
     throw error;
   }
 };
+
+export const obterSementes = async () => {
+  try {
+    const response = await axios.get(apiUrl + '/semente');
+    return response.data; 
+  } catch (error) {
+    console.error('Erro ao obter sementes:', error);
+    throw error; 
+  }
+};
+
+export const obterSolos = async () => {
+  try {
+    const response = await axios.get(apiUrl + '/solo');
+    return response.data; 
+  } catch (error) {
+    console.error('Erro ao obter solos:', error);
+    throw error; 
+  }
+};
+
+export const obterColheitas = async () => {
+  try {
+    const response = await axios.get(apiUrl + '/colheita');
+    return response.data; 
+  } catch (error) {
+    console.error('Erro ao obter colheitas:', error);
+    throw error; 
+  }
+};
+
+
+export const obterCultivos = async () => {
+  try {
+    const response = await axios.get(apiUrl + '/cultivo');
+    return response.data; 
+  } catch (error) {
+    console.error('Erro ao obter cultivos:', error);
+    throw error; 
+  }
+};
+
+export const obterSafras = async () => {
+  try {
+    const response = await axios.get(apiUrl + '/safra');
+    return response.data; 
+  } catch (error) {
+    console.error('Erro ao obter safras:', error);
+    throw error; 
+  }
+};

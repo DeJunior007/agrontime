@@ -69,41 +69,60 @@ const CriarCultura = () => {
     setActiveTab(tab);
   };
 
-  const handleSubmit = async (data, apiFunction) => {
+  const formatDateToISO = (dateStr) => {
+    const [day, month, year] = dateStr.split("/").map(Number);
+    return new Date(Date.UTC(year, month - 1, day)).toISOString();
+  };
+  
+const handleSubmit = async (data, apiFunction) => {
+  // Format dates, convert fields starting with "id" to integers, and convert qtdSacas to number
+  const formattedData = Object.fromEntries(
+    Object.entries(data).map(([key, value]) => [
+      key,
+      // Check if the field is a date and format it
+      typeof value === "string" && value.match(/^\d{2}\/\d{2}\/\d{4}$/)
+        ? formatDateToISO(value)
+        // Check if the key starts with "id" and convert to integer
+        : key.startsWith("id") && typeof value === "string"
+        ? parseInt(value, 10)
+        // Convert qtdSacas to a number
+        : key === "qtdSacas" && typeof value === "string"
+        ? Number(value)
+
+        : key === "peso" && typeof value === "string"
+        ? Number(value)
+
+        : key === "valorEstimado" && typeof value === "string"
+        ? Number(value)
+        : value,
+        
+    ])
+  );
+
     try {
-      const response = await apiFunction(data);
-      console.log('Resposta da API:', response);
+      const response = await apiFunction(formattedData);
+      console.log("Resposta da API:", response);
       const { statusCode, message } = response.data || {};
-      
-      if (!statusCode || (statusCode !== 200 && statusCode !== 201)) {
-        console.log('Erro no statusCode:', statusCode);
+  
+      if (statusCode !== 200 && statusCode !== 201) {
+        console.log("Erro no statusCode:", statusCode);
         setModalMessage({
           message: message || "Ocorreu um erro ao adicionar a entidade.",
           entity: "",
           isError: true,
         });
       } else {
-        console.log('Operação bem-sucedida:', response.data);
+        console.log("Operação bem-sucedida:", response.data);
         setModalMessage({
           message: message || "Operação realizada com sucesso.",
           entity: response.data.nome || "Entidade",
           isError: false,
         });
       }
+  
       setIsModalOpen(true);
     } catch (error) {
-            console.error('Erro ao executar a função:', error); // Debug: erro na execução
-
-      console.error('Erro ao executar a função:', error); // Debug: erro na execução
-      console.error('Dados do erro:', error.response?.data); // Mostrando dados do erro
-      console.error('Mensagem de erro:', error.message); // Mensagem de erro geral
-  
-      setModalMessage({
-        message: error.response?.data?.message || "Ocorreu um erro ao adicionar a entidade.",
-        entity: "",
-        isError: true,
-      });
-      setIsModalOpen(true);
+      alert("Erro de rede");
     }
   };
   

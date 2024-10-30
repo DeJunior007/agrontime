@@ -100,7 +100,6 @@
         "id": "peso",
         "label": "Peso",
         "type": "number",
-        "mask": "99999", 
         "validation": "required",
         "icon": "fas fa-weight"
       },
@@ -108,7 +107,6 @@
         "id": "valorEstimado",
         "label": "Valor Estimado",
         "type": "number",
-        "mask": "99999", 
         "validation": "required",
         "icon": "fas fa-dollar-sign"
       },
@@ -117,11 +115,11 @@
         "label": "Qualidade",
         "type": "select",
         "options": [
-          { "value": "OTIMA", "label": "Ótima" },
-          { "value": "BOA", "label": "Boa" },
-          { "value": "REGULAR", "label": "Regular" },
-          { "value": "RUIM", "label": "Ruim" },
-          { "value": "PESSIMA", "label": "Péssima" }
+          { "value": "ótima", "label": "Ótima" },
+          { "value": "bom", "label": "Boa" },
+          { "value": "regular", "label": "Regular" },
+          { "value": "ruim", "label": "Ruim" },
+          { "value": "péssima", "label": "Péssima" }
         ],
         "validation": "required",
         "icon": "fas fa-star"
@@ -130,14 +128,15 @@
         "id": "dataColheita",
         "label": "Data da Colheita",
         "type": "date",
-        "mask": "99/99/9999", 
+        "mask": "99/99/9999",
         "validation": "required",
         "icon": "fas fa-calendar"
       },
       "idCultivo": {
         "id": "idCultivo",
         "label": "ID do Cultivo",
-        "type": "text",
+        "type": "select",
+        "options": [],
         "validation": "required",
         "icon": "fas fa-leaf"
       },
@@ -145,7 +144,6 @@
         "id": "qtdSacas",
         "label": "Quantidade de Sacas",
         "type": "number",
-        "mask": "99", 
         "validation": "required",
         "icon": "fas fa-box"
       }
@@ -153,22 +151,25 @@
     "cultivo": {
       "idSolo": {
         "id": "idSolo",
-        "label": "ID do Solo",
-        "type": "text",
+        "label": "Tipo do solo",
+        "type": "select",
+        "options": [],
         "validation": "required",
         "icon": "fas fa-soil"
       },
       "idSafra": {
         "id": "idSafra",
-        "label": "ID da Safra",
-        "type": "text",
+        "label": "Safra",
+        "type": "select",
+        "options": [],
         "validation": "required",
         "icon": "fas fa-flag"
       },
       "idSemente": {
         "id": "idSemente",
-        "label": "ID da Semente",
-        "type": "text",
+        "label": "Semente",
+        "type": "select",
+        "options": [],
         "validation": "required",
         "icon": "fas fa-seedling"
       },
@@ -183,7 +184,7 @@
         "id": "areaTotal",
         "label": "Área Total",
         "type": "number",
-        "mask": "99999", 
+        "mask": "99999",
         "validation": "required",
         "icon": "fas fa-map"
       },
@@ -191,7 +192,7 @@
         "id": "dataPlantio",
         "label": "Data do Plantio",
         "type": "date",
-        "mask": "99/99/9999", 
+        "mask": "99/99/9999",
         "validation": "required",
         "icon": "fas fa-calendar"
       }
@@ -209,11 +210,11 @@
         "label": "Status",
         "type": "select",
         "options": [
-          { "value": "PLANTANDO", "label": "Plantando" },
-          { "value": "ADUBANDO", "label": "Adubando" },
-          { "value": "GERMINANDO", "label": "Germinando" },
-          { "value": "COLHENDO", "label": "Colhendo" },
-          { "value": "CONCLUIDO", "label": "Concluído" }
+          { "value": "Plantando", "label": "Plantando" },
+          { "value": "Adubando", "label": "Adubando" },
+          { "value": "Germinando", "label": "Germinando" },
+          { "value": "Colhendo", "label": "Colhendo" },
+          { "value": "Concluido", "label": "Concluído" }
         ],
         "validation": "required",
         "icon": "fas fa-flag"
@@ -222,7 +223,7 @@
         "id": "dataInicio",
         "label": "Data de Início",
         "type": "date",
-        "mask": "99/99/9999", 
+        "mask": "99/99/9999",
         "validation": "required",
         "icon": "fas fa-calendar"
       },
@@ -230,7 +231,7 @@
         "id": "dataFim",
         "label": "Data de Fim",
         "type": "date",
-        "mask": "99/99/9999", 
+        "mask": "99/99/9999",
         "validation": "required",
         "icon": "fas fa-calendar"
       }
