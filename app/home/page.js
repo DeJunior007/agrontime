@@ -220,32 +220,42 @@ export default function Home() {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {/* Card de Cultivos */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-gray-500 text-sm">Detalhes do Cultivo</h3>
-                <p className="text-2xl font-bold text-gray-900">{cultivos[0]?.nome || 'N/A'}</p>
-                <p className="text-sm text-gray-500">Área: {cultivos[0]?.areaTotal || 0} ha</p>
-                <p className="text-sm text-gray-500">Data Plantio: {cultivos[0]?.dataPlantio ? formatarData(cultivos[0].dataPlantio) : 'N/A'}</p>
-              </div>
+          <div className="bg-white rounded-xl shadow-md p-6">
+  <h3 className="text-gray-500 text-sm">Detalhes do Cultivo</h3>
+  <p className="text-2xl font-bold text-gray-900">{cultivos[cultivos.length - 1]?.nome || 'N/A'}</p>
+  <p className="text-sm text-gray-500">Área: {cultivos[cultivos.length - 1]?.areaTotal || 0} ha</p>
+  <p className="text-sm text-gray-500">
+    Data Plantio: {cultivos[cultivos.length - 1]?.dataPlantio ? formatarData(cultivos[cultivos.length - 1].dataPlantio) : 'N/A'}
+  </p>
+</div>
+
 
               {/* Card de Colheita */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-gray-500 text-sm">Última Colheita</h3>
-                <p className="text-2xl font-bold text-gray-900">{colheitas[0]?.qtdSacas || 0} sacas</p>
-                <p className="text-sm text-gray-500">Peso: {colheitas[0]?.peso || 0} kg</p>
-                <p className="text-sm text-gray-500">Valor: R$ {colheitas[0]?.valorEstimado || 0}</p>
-                <p className="text-sm text-gray-500">Qualidade: {colheitas[0]?.qualidade || 'N/A'}</p>
-              </div>
+         {/* Card de Colheita */}
+<div className="bg-white rounded-xl shadow-md p-6">
+  <h3 className="text-gray-500 text-sm">Última Colheita</h3>
+  <p className="text-2xl font-bold text-gray-900">
+    {colheitas[colheitas.length - 1]?.qtdSacas || 0} sacas
+  </p>
+  <p className="text-sm text-gray-500">Peso: {colheitas[colheitas.length - 1]?.peso || 0} kg</p>
+  <p className="text-sm text-gray-500">Valor: R$ {colheitas[colheitas.length - 1]?.valorEstimado || 0}</p>
+  <p className="text-sm text-gray-500">Qualidade: {colheitas[colheitas.length - 1]?.qualidade || 'N/A'}</p>
+</div>
+
 
               {/* Card de Safra */}
-              <div className="bg-white rounded-xl shadow-md p-6">
-                <h3 className="text-gray-500 text-sm">Status da Safra</h3>
-                <p className="text-2xl font-bold text-gray-900">{safras[0]?.status || 'N/A'}</p>
-                <p className="text-sm text-gray-500">
-                  Período: {safras[0]?.dataInicio ? formatarData(safras[0].dataInicio) : 'N/A'} - 
-                  {safras[0]?.dataFim ? formatarData(safras[0].dataFim) : 'N/A'}
-                </p>
-              </div>
-            </div>
+         {/* Card de Safra */}
+<div className="bg-white rounded-xl shadow-md p-6">
+  <h3 className="text-gray-500 text-sm">Status da Safra</h3>
+  <p className="text-2xl font-bold text-gray-900">
+    {safras[safras.length - 1]?.status || 'N/A'}
+  </p>
+  <p className="text-sm text-gray-500">
+    Período: {safras[safras.length - 1]?.dataInicio ? formatarData(safras[safras.length - 1].dataInicio) : 'N/A'} - 
+    {safras[safras.length - 1]?.dataFim ? formatarData(safras[safras.length - 1].dataFim) : 'N/A'}
+  </p>
+</div>
+
 
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -283,15 +293,15 @@ export default function Home() {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Nome:</span>
-                    <span className="font-semibold">{cultivos[0]?.nome}</span>
+                    <span className="font-semibold">{cultivos[cultivos.length - 1]?.nome}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Área Total:</span>
-                    <span className="font-semibold">{cultivos[0]?.areaTotal} ha</span>
+                    <span className="font-semibold">{cultivos[cultivos.length - 1]?.areaTotal} ha</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Data de Plantio:</span>
-                    <span className="font-semibold">{formatarData(cultivos[0]?.dataPlantio)}</span>
+                    <span className="font-semibold">{formatarData(cultivos[cultivos.length - 1]?.dataPlantio)}</span>
                   </div>
                 </div>
               </div>
