@@ -12,8 +12,6 @@ const Fazendas = () => {
   const [fazendas, setFazendas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
 
   useEffect(() => {
     const carregarFazendas = async () => {
@@ -33,28 +31,38 @@ const Fazendas = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    try {
-      const jwt = getJWTFromCookie();
-      await deletarFazenda(id, jwt);
-      setFazendas(fazendas.filter((fazenda) => fazenda.idFazenda !== id));
-      Swal.fire("Sucesso!", "Fazenda deletada com sucesso!", "success");
-    } catch (error) {
-      console.error("Erro ao deletar fazenda:", error);
-      Swal.fire("Erro!", "Erro ao deletar fazenda.", "error");
+    // Show confirmation dialog first
+    const result = await Swal.fire({
+      title: 'Tem certeza?',
+      text: "Você não poderá reverter esta ação!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sim, deletar!',
+      cancelButtonText: 'Cancelar'
+    });
+
+    // Only proceed with deletion if user confirmed
+    if (result.isConfirmed) {
+      try {
+        const jwt = getJWTFromCookie();
+        await deletarFazenda(id, jwt);
+        setFazendas(fazendas.filter((fazenda) => fazenda.idFazenda !== id));
+        Swal.fire(
+          'Deletado!',
+          'A fazenda foi deletada com sucesso.',
+          'success'
+        );
+      } catch (error) {
+        console.error("Erro ao deletar fazenda:", error);
+        Swal.fire("Erro!", "Erro ao deletar fazenda.", "error");
+      }
     }
   };
 
   const handleManage = (id) => {
     window.location.href = `/gerenciar-fazenda/${id}`;
-  };
-
-  const totalPages = Math.ceil(fazendas.length / itemsPerPage);
-  const currentFazendas = fazendas.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
   };
 
   if (loading) {
@@ -72,6 +80,7 @@ const Fazendas = () => {
       </>
     );
   }
+  
 
   if (error) {
     return (
@@ -82,85 +91,74 @@ const Fazendas = () => {
   }
 
   return (
-    <main className="bg-gray-100 min-h-screen transition-all duration-300 ease-in-out">
+    <main className="bg-gray-50 min-h-screen">
       <Navbar />
-      <section className="mx-auto p-4 max-w-7xl">
-        <h1 className="text-3xl font-bold text-slate-100 px-4 py-2 mb-4 rounded-lg shadow-lg bg-[#053027]">
-          Lista de Fazendas
-        </h1>
+      <section className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+            Lista de Fazendas
+          </h1>
+          <p className="text-gray-600 mt-2">Gerencie suas fazendas cadastradas</p>
+        </div>
+
         <motion.div
-          key={currentPage} // Ensures the animation runs when the page changes
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -50 }}
-          transition={{ duration: 0.3 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-lg overflow-hidden"
         >
-          <table className="min-w-full bg-white border-collapse shadow-md rounded-lg overflow-hidden">
-            <thead>
-              <tr className="bg-primary text-slate-100 uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-center">Nome da Fazenda</th>
-                <th className="py-3 px-6 text-center">ID da Fazenda</th>
-                <th className="py-3 px-6 text-center">Ações</th>
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-green-700">
+              <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-white uppercase tracking-wider">
+                  Nome da Fazenda
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  NIRF
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  Área (ha)
+                </th>
+                <th className="px-6 py-4 text-center text-xs font-medium text-white uppercase tracking-wider">
+                  Ações
+                </th>
               </tr>
             </thead>
-            <tbody>
-              {currentFazendas.length > 0 ? (
-                currentFazendas.map((fazenda, index) => (
-                  <tr
-                    key={fazenda.idFazenda}
-                    className={`${
-                      index % 2 === 0 ? "bg-white" : "bg-slate-200"
-                    } transition duration-200 hover:bg-slate-300`}
-                  >
-                    <td className="py-3 px-6 text-center whitespace-nowrap">
-                      {fazenda.nome}
-                    </td>
-                    <td className="py-3 px-6 text-center">{fazenda.idFazenda}</td>
-                    <td className="py-3 px-6 text-center space-x-4 flex justify-center items-center">
+            <tbody className="divide-y divide-gray-200">
+              {fazendas.map((fazenda) => (
+                <tr 
+                  key={fazenda.idFazenda}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700">
+                    {fazenda.nome}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 text-center">
+                    {fazenda.nirf}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-700 text-center">
+                    {fazenda.areaPropriedade}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
+                    <div className="flex justify-center space-x-3">
                       <button
                         onClick={() => handleDelete(fazenda.idFazenda)}
-                        className="flex items-center text-red-500 hover:text-red-700 font-semibold transition duration-200"
+                        className="text-red-600 hover:text-red-800 transition-colors"
                       >
-                        <FaTrash className="mr-1" />
-                        Deletar
+                        <FaTrash />
                       </button>
                       <button
                         onClick={() => handleManage(fazenda.idFazenda)}
-                        className="flex items-center text-blue-500 hover:text-blue-700 font-semibold transition duration-200"
+                        className="text-blue-600 hover:text-blue-800 transition-colors"
                       >
-                        <FaPencil className="mr-1" />
-                        Gerenciar
+                        <FaPencil />
                       </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="py-3 px-6 text-center">
-                    Não há fazendas disponíveis.
+                    </div>
                   </td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </motion.div>
-        <div className="flex justify-center mt-6">
-          <div className="flex items-center">
-            {Array.from({ length: totalPages }, (_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-                className={`w-8 h-8 mx-1 rounded-full transition duration-300 ease-in-out ${
-                  currentPage === index + 1
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </div>
-        </div>
       </section>
     </main>
   );

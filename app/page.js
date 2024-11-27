@@ -6,20 +6,20 @@ import PhraseYe from "./components/phraseye";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col lg:flex-row justify-center w-full h-full lg:justify-between items-center sm:p-0 pb-10">
-      <div className="absolute w-[90%] sm:w-auto flex justify-start top-0 left-0 m-4">
+    <main className="flex min-h-screen flex-col lg:flex-row justify-center w-full h-full lg:justify-between items-center p-4 lg:p-0">
+      <div className="fixed lg:absolute w-full lg:w-auto flex justify-start top-0 left-0 p-4 z-10 bg-black lg:bg-transparent">
         <Image
           src={logo}
           alt="Logo"
-          className="rounded-full w-[75px] sm:w-[100px] md:w-[125px] lg:w-[150px]"
+          className="w-16 sm:w-20 md:w-24 lg:w-32 rounded-full"
         />
       </div>
 
-      <div className="w-[90%] max-w-md lg:max-w-[40%] bg-transparent lg:bg-zinc-900 h-auto lg:h-screen flex flex-col justify-center items-center p-4">
+      <div className="w-full mt-20 lg:mt-0 lg:w-[40%] bg-transparent lg:bg-zinc-900 min-h-[50vh] lg:h-screen flex flex-col justify-center items-center p-4 lg:p-8">
         <LoginContent />
       </div>
 
-      <div className="w-[90%] max-w-md lg:max-w-[60%] bg-[#084739] h-auto lg:h-screen flex flex-col justify-center items-center p-4">
+      <div className="w-full lg:w-[60%] bg-[#084739] min-h-[50vh] lg:h-screen flex flex-col justify-center items-center p-4 lg:p-8">
         <LoginForm />
       </div>
 

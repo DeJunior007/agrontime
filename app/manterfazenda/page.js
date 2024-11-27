@@ -1,240 +1,317 @@
 "use client";
-import { useState } from "react";
-import { z } from "zod";
-import Swal from "sweetalert2";
-import Navbar from "../components/Navbar/index.js";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import Navbar from "../components/Navbar";
 import Input from "../components/Input.js";
-import inputsConfig from "./forms.json";
-import { inputSchema } from "./zod";
-import enviarDadosFazenda from "../api/gerenciarFazendaApi/index.js";
+import Modal from "../components/Modal";
+import { useFormSubmission } from "../hooks/useFormSubmission";
 
 const CriarFazenda = () => {
-  const [errors, setErrors] = useState({});
-  const [fazenda, setFazenda] = useState({
-    idUsuario: 2,
+  const [formData, setFormData] = useState({
+    idUsuario: "1",
     nome: "",
     nirf: "",
     areaPropriedade: "",
-    cep: "",
-    rua: "",
-    numero: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    estado: "",
+    endereco: {
+      cep: "",
+      rua: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: ""
+    }
   });
+  const [errors, setErrors] = useState({});
+  const { submitForm, modalState, closeModal } = useFormSubmission();
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [showButtons, setShowButtons] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    setFazenda((prevFazenda) => ({
-      ...prevFazenda,
-      [name]: value,
-    }));
+  const formFields = {
+    nome: {
+      type: "text",
+      label: "Nome da Fazenda",
+      icon: "home",
+      required: true,
+    },
+    nirf: {
+      type: "text",
+      label: "NIRF",
+      icon: "file-alt",
+      required: true,
+    },
+    areaPropriedade: {
+      type: "number",
+      label: "Área da Propriedade (ha)",
+      icon: "ruler",
+      required: true,
+    },
+    "endereco.cep": {
+      type: "text",
+      label: "CEP",
+      icon: "map-marker-alt",
+      required: true,
+      mask: "99999-999"
+    },
+    "endereco.rua": {
+      type: "text",
+      label: "Rua",
+      icon: "road",
+      required: true,
+    },
+    "endereco.numero": {
+      type: "text",
+      label: "Número",
+      icon: "building",
+      required: true,
+    },
+    "endereco.complemento": {
+      type: "text",
+      label: "Complemento",
+      icon: "info-circle",
+      required: false,
+    },
+    "endereco.bairro": {
+      type: "text",
+      label: "Bairro",
+      icon: "map-signs",
+      required: true,
+    },
+    "endereco.cidade": {
+      type: "text",
+      label: "Cidade",
+      icon: "city",
+      required: true,
+    },
+    "endereco.estado": {
+      type: "text",
+      label: "Estado",
+      icon: "map",
+      required: true,
+    }
   };
 
-  const handleBlur = (e) => {
-    const { name } = e.target;
-
+  const buscarCep = async (cep) => {
     try {
-      inputSchema.parse(fazenda); // Valida a fazenda inteira
-      setErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        // Atualiza erros com as mensagens do Zod
-        setErrors((prevErrors) => {
-          const newErrors = { ...prevErrors };
-          error.errors.forEach((err) => {
-            newErrors[err.path.join(".")] = err.message;
-          });
-          return newErrors;
-        });
-      }
-    }
-  };
+      const cepLimpo = cep.replace(/\D/g, '');
+      if (cepLimpo.length !== 8) return;
 
-  const validateEndereco = () => {
-    const enderecoFields = [
-      "cep",
-      "rua",
-      "numero",
-      "bairro",
-      "cidade",
-      "estado",
-    ];
-    let newErrors = {};
+      const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+      const data = await response.json();
 
-    enderecoFields.forEach((field) => {
-      if (!fazenda[field]) {
-        newErrors[field] = "Este campo é obrigatório.";
-      }
-    });
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Impede o comportamento padrão do formulário
-
-    setErrors({}); // Limpa erros anteriores
-
-    // Validação dos dados da fazenda
-    const enderecoErrors = validateEndereco(); // Valida os campos de endereço
-
-    const schemaErrors = inputSchema.safeParse(fazenda); // Valida usando Zod
-    // Combine todos os erros
-    const combinedErrors = { ...enderecoErrors };
-
-    if (!schemaErrors.success) {
-      schemaErrors.error.errors.forEach((err) => {
-        combinedErrors[err.path.join(".")] = err.message; // Agrupa os erros pelos campos correspondentes
-      });
-    }
-
-    if (Object.keys(combinedErrors).length) {
-      // Se houver erros, atualiza o estado de erros e exibe mensagem
-      setErrors(combinedErrors);
-      const errorMessages = Object.values(combinedErrors).join("\n");
-      Swal.fire({
-        icon: "error",
-        title: "Erro na Validação!",
-        text: "Verifique os seguintes campos:\n" + errorMessages,
-      });
-      return; // Para a execução do submit
-    }
-
-    try {
-      // Envio dos dados para a API
-      let schemaErrorsData = schemaErrors.data ?? {};
-
-      let fazendaVerificada = {
-        idUsuario: fazenda?.idUsuario,
-        nome: schemaErrorsData?.nome,
-        nirf: schemaErrorsData?.nirf,
-        areaPropriedade: schemaErrorsData?.areaPropriedade,
-        endereco: {
-          cep: schemaErrorsData?.cep,
-          rua: schemaErrorsData?.rua,
-          numero: schemaErrorsData?.numero,
-          complemento: schemaErrorsData?.complemento,
-          bairro: schemaErrorsData?.bairro,
-          cidade: schemaErrorsData?.cidade,
-          estado: schemaErrorsData?.estado,
-        },
-      };
-      const response = await enviarDadosFazenda(fazendaVerificada);
-
-      if (
-        response &&
-        (response.statusCode === 201 || response.statusCode === 200)
-      ) {
-        // Exibe mensagem de sucesso
-        Swal.fire({
-          icon: "success",
-          title: "Sucesso!",
-          text: `Fazenda criada com sucesso! ID: ${response.data.idFazenda}`,
-          showCancelButton: true,
-          confirmButtonText: "Ver Fazendas",
-          cancelButtonText: "OK",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = "/visualizarfazendas"; // Redireciona para a página de visualização
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            cep: cep,
+            rua: data.logradouro,
+            bairro: data.bairro,
+            cidade: data.localidade,
+            estado: data.uf
           }
-        });
-      } else {
-        // Exibe mensagem de erro se a resposta não for 200 ou 201
-        Swal.fire(
-          "Erro",
-          response.message ||
-            "Operação realizada, mas sem mensagem de sucesso.",
-          "error"
-        );
+        }));
       }
     } catch (error) {
-      console.error("Erro ao enviar dados:", error);
-      // Exibe mensagem de erro genérica
-      Swal.fire({
-        icon: "error",
-        title: "Erro!",
-        text:
-          error.message || "Ocorreu um erro desconhecido ao enviar os dados.",
+      console.error('Erro ao buscar CEP:', error);
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name.startsWith('endereco.')) {
+      const enderecoField = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          [enderecoField]: value
+        }
+      }));
+
+      if (enderecoField === 'cep' && value.replace(/\D/g, '').length === 8) {
+        buscarCep(value);
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    // Validação dos campos principais
+    if (!formData.nome?.trim()) {
+      newErrors.nome = "Nome é obrigatório";
+    }
+    
+    if (!formData.nirf?.trim()) {
+      newErrors.nirf = "NIRF é obrigatório";
+    }
+    
+    if (!formData.areaPropriedade) {
+      newErrors.areaPropriedade = "Área da propriedade é obrigatória";
+    }
+
+    // Validação do CEP
+    if (!formData.endereco?.cep?.trim()) {
+      newErrors["endereco.cep"] = "CEP é obrigatório";
+    } else if (!/^\d{5}-?\d{3}$/.test(formData.endereco.cep)) {
+      newErrors["endereco.cep"] = "CEP inválido";
+    }
+
+    // Validação do número
+    if (!formData.endereco?.numero?.trim()) {
+      newErrors["endereco.numero"] = "Número é obrigatório";
+    }
+
+    // Validação do bairro
+    if (!formData.endereco?.bairro?.trim()) {
+      newErrors["endereco.bairro"] = "Bairro é obrigatório";
+    }
+
+    // Validação da cidade
+    if (!formData.endereco?.cidade?.trim()) {
+      newErrors["endereco.cidade"] = "Cidade é obrigatória";
+    }
+
+    // Validação do estado
+    if (!formData.endereco?.estado?.trim()) {
+      newErrors["endereco.estado"] = "Estado é obrigatório";
+    }
+
+    // Validação da rua
+    if (!formData.endereco?.rua?.trim()) {
+      newErrors["endereco.rua"] = "Rua é obrigatória";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
+    const formattedData = {
+      ...formData,
+      areaPropriedade: parseFloat(formData.areaPropriedade),
+    };
+
+    const success = await submitForm(formattedData, "fazenda");
+    if (success) {
+      setFormData({
+        idUsuario: "1",
+        nome: "",
+        nirf: "",
+        areaPropriedade: "",
+        endereco: {
+          cep: "",
+          rua: "",
+          numero: "",
+          complemento: "",
+          bairro: "",
+          cidade: "",
+          estado: ""
+        }
       });
+      setErrors({});
     }
   };
 
   return (
-    <>
+    <main className="bg-gray-50 min-h-screen">
       <Navbar />
-      <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 space-y-6">
-          <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
-            Criar Fazenda
+      <section className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+            Nova Fazenda
           </h1>
-          <p className="text-gray-600 text-center mt-2">
-            Nesta página, você pode criar uma nova fazenda.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {inputsConfig.map((input) => (
-              <div key={input.id} className="mb-4">
-                <div className="flex items-center ">
-                  <i className={`${input.icon} text-gray-500 mr-2`}></i>
-                  <Input
-                    id={input.id}
-                    type={input.type}
-                    label={input.label}
-                    value={fazenda[input.name]}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={errors[input.name]}
-                    name={input.name}
-                    options={input.options}
-                    mask={input.mask}
-                  />
-                </div>
-                {errors[input.name] && (
-                  <p className="text-red-500 text-[12px] ml-6">
-                    {errors[input.name]}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-end mt-6 md:col-span-2">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
-            >
-              Criar Fazenda
-            </button>
-          </div>
-          {successMessage && (
-            <div className="mt-4 text-green-600 text-center">
-              {successMessage}
+          <p className="text-gray-600 mt-2">Preencha os dados para cadastrar uma nova fazenda</p>
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-lg p-8"
+        >
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {Object.entries(formFields).map(([key, field], index) => (
+                <motion.div
+                  key={key}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="form-group relative"
+                >
+                  <div className="flex items-start space-x-3">
+                    <div className="flex-shrink-0 w-10 h-10">
+                      <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                        <i className={`fas fa-${field.icon} text-lg text-green-600`}></i>
+                      </div>
+                    </div>
+
+                    <div className="flex-1">
+                      <Input
+                        id={key}
+                        type={field.type}
+                        name={key}
+                        label={field.label}
+                        value={key.startsWith('endereco.') 
+                          ? formData.endereco?.[key.split('.')[1]] || ""
+                          : formData[key] || ""}
+                        onChange={handleInputChange}
+                        error={errors[key]}
+                        required={field.required}
+                        placeholder={`Digite ${field.label.toLowerCase()}`}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
-          )}
-          {showButtons && (
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={() => (window.location.href = "/visualizarfazendas")}
-                className="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 mr-4"
+
+            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+              <motion.button
+                type="button"
+                onClick={() => setFormData({
+                  idUsuario: "1",
+                  nome: "",
+                  nirf: "",
+                  areaPropriedade: "",
+                  endereco: {
+                    cep: "",
+                    rua: "",
+                    numero: "",
+                    complemento: "",
+                    bairro: "",
+                    cidade: "",
+                    estado: ""
+                  }
+                })}
+                className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                Ver Fazendas
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg hover:bg-gray-700 transition duration-300"
+                Limpar
+              </motion.button>
+              <motion.button
+                type="submit"
+                className="px-6 py-2 rounded-lg text-white font-medium bg-gradient-to-r from-green-600 to-green-800 hover:shadow-lg transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                OK
-              </button>
+                Salvar Fazenda
+              </motion.button>
             </div>
-          )}
-        </form>
-      </main>
-    </>
+          </form>
+        </motion.div>
+      </section>
+    </main>
   );
 };
 

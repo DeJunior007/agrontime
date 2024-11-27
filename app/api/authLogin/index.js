@@ -19,8 +19,7 @@ const authLogin = async (email, senha) => {
       }
     );
 
-    if (response.data && response.data.data.access_token) {
-      // Salva o token no sessionStorage
+    if (response.data && response.data.statusCode === 200 && response.data.data.access_token) {
       sessionStorage.setItem('jwt', response.data.data.access_token);
       window.location.href = "/home";
     } else {

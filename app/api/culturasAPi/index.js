@@ -7,14 +7,42 @@ const api = axios.create({
   },
 });
 
+// Função genérica para tratar erros
+const handleApiError = (error, operacao) => {
+  if (error.response) {
+    // O servidor respondeu com um status de erro
+    throw {
+      status: error.response.status,
+      message: error.response.data.message || `Erro ao ${operacao}`,
+      data: error.response.data
+    };
+  } else if (error.request) {
+    // A requisição foi feita mas não houve resposta
+    throw {
+      status: 503,
+      message: 'Erro de conexão com o servidor',
+      data: null
+    };
+  } else {
+    // Erro na configuração da requisição
+    throw {
+      status: 500,
+      message: error.message,
+      data: null
+    };
+  }
+};
+
 // Função para criar um solo
 export const criarSolo = async (soloData) => {
   try {
     const response = await api.post('/solo/criar-solo', soloData);
-    return response.data;
+    return {
+      status: response.status,
+      data: response.data
+    };
   } catch (error) {
-    console.error('Erro ao criar solo:', error);
-    throw error;
+    throw handleApiError(error, 'criar solo');
   }
 };
 
@@ -22,10 +50,12 @@ export const criarSolo = async (soloData) => {
 export const criarSemente = async (sementeData) => {
   try {
     const response = await api.post('/semente/criar', sementeData);
-    return response.data;
+    return {
+      status: response.status,
+      data: response.data
+    };
   } catch (error) {
-    console.error('Erro ao criar semente:', error);
-    throw error;
+    throw handleApiError(error, 'criar semente');
   }
 };
 
@@ -44,10 +74,12 @@ export const buscarSementePorId = async (idSemente) => {
 export const criarCultivo = async (cultivoData) => {
   try {
     const response = await api.post('/cultivo/criar-cultivo', cultivoData);
-    return response.data;
+    return {
+      status: response.status,
+      data: response.data
+    };
   } catch (error) {
-    console.error('Erro ao criar cultivo:', error);
-    throw error;
+    throw handleApiError(error, 'criar cultivo');
   }
 };
 
@@ -88,10 +120,12 @@ export const deletarCultivo = async (idCultivo) => {
 export const criarSafra = async (safraData) => {
   try {
     const response = await api.post('/safra/criar-safra', safraData);
-    return response.data;
+    return {
+      status: response.status,
+      data: response.data
+    };
   } catch (error) {
-    console.error('Erro ao criar safra:', error);
-    throw error;
+    throw handleApiError(error, 'criar safra');
   }
 };
 
@@ -132,10 +166,12 @@ export const deletarSafra = async (idSafra) => {
 export const criarColheita = async (colheitaData) => {
   try {
     const response = await api.post('/colheita/criar-colheita', colheitaData);
-    return response.data;
+    return {
+      status: response.status,
+      data: response.data
+    };
   } catch (error) {
-    console.error('Erro ao criar colheita:', error);
-    throw error;
+    throw handleApiError(error, 'criar colheita');
   }
 };
 

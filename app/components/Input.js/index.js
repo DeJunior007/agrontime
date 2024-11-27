@@ -1,90 +1,86 @@
-import React, { useRef } from 'react';
-import InputMask from 'react-input-mask'; // Importando a biblioteca de máscara
-
-const Input = ({ id, type = 'text', label, value, onChange, onBlur, error, name, mask, options }) => {
-  const selectRef = useRef(null);
-
-  const handleArrowClick = () => {
-    if (selectRef.current) {
-      selectRef.current.focus(); // Foca no select para abrir o menu suspenso
+const Input = ({
+  id,
+  type = "text",
+  name,
+  label,
+  value,
+  onChange,
+  error,
+  options,
+  mask,
+  required,
+  placeholder
+}) => {
+  const baseInputClasses = `
+    w-full px-4 py-2.5 rounded-lg
+    bg-gray-50 border transition-all duration-300
+    focus:outline-none focus:ring-2
+    ${error
+      ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
+      : 'border-gray-200 focus:border-green-500 focus:ring-green-200'
     }
-  };
+  `;
 
   return (
-    <div className="relative mb-4 w-full">
+    <div className="form-control w-full">
+      <label 
+        htmlFor={id} 
+        className="block text-sm font-medium text-gray-700 mb-1"
+      >
+        {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
+      </label>
+
       {type === 'select' ? (
-        <div className="block relative">
+        <div>
           <select
             id={id}
             name={name}
-            ref={selectRef}
-            className={`block cursor-pointer w-full h-full rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-white border-b-4 appearance-none ${error ? 'border-[#F35746]' : 'border-[#084739]'} focus:outline-none focus:ring-0 focus:border-[#084739] peer`}
-            value={value}
+            value={value || ""}
             onChange={onChange}
-            onBlur={onBlur}
+            className={baseInputClasses}
           >
-            <option value="" disabled hidden>
-              {label}
-            </option>
-            {options.map(option => (
+            <option value="">Selecione uma opção</option>
+            {options?.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
           </select>
-          {/* Ícone de seta clicável */}
-          <span
-            className="absolute right-3 top-4 text-gray-500 "
-            onClick={handleArrowClick}
-            aria-hidden="true" // Para acessibilidade
-          >
-            <i className="fa fa-chevron-down" aria-hidden="true"></i>
-          </span>
-          <label
-            htmlFor={id}
-            className={`absolute text-sm transition-all duration-300 transform top-5 z-10 origin-[0] left-2.5 
-              ${value ? 'scale-75 -translate-y-4' : 'scale-100 translate-y-0'} 
-              ${error ? 'text-[#F35746]' : 'text-gray-500'}`}
-          >
-            {label}
-          </label>
-        </div>
-      ) : (
-        <div className="block">
-          {mask ? (
-            <InputMask
-              mask={mask}
-              id={id}
-              name={name}
-              className={`block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-white border-b-4 appearance-none ${error ? 'border-[#F35746]' : 'border-[#084739]'} focus:outline-none focus:ring-0 focus:border-[#084739] peer`}
-              placeholder=" "
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              autoComplete="off"
-            />
-          ) : (
-            <input
-              type={type}
-              id={id}
-              name={name}
-              className={`block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-white border-b-4 appearance-none ${error ? 'border-[#F35746]' : 'border-[#084739]'} focus:outline-none focus:ring-0 focus:border-[#084739] peer`}
-              placeholder=" "
-              value={value}
-              onChange={onChange}
-              onBlur={onBlur}
-              autoComplete="off"
-            />
+          {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
           )}
-          <label
-            htmlFor={id}
-            className={`absolute text-sm transition-all duration-300 transform top-5 z-10 origin-[0] left-2.5 
-              ${value ? 'scale-75 -translate-y-4' : 'scale-100 translate-y-0'} 
-              ${error ? 'text-[#F35746]' : 'text-gray-500'}`}
-          >
-            {label}
-          </label>
         </div>
+      ) : type === 'textarea' ? (
+        <>
+          <textarea
+            id={id}
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            className={`${baseInputClasses} min-h-[100px]`}
+            placeholder={placeholder}
+          />
+          {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          )}
+        </>
+      ) : (
+        <>
+          <input
+            id={id}
+            type={type}
+            name={name}
+            value={value || ""}
+            onChange={onChange}
+            className={baseInputClasses}
+            placeholder={placeholder}
+            required={required}
+          />
+          {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          )}
+        </>
       )}
     </div>
   );

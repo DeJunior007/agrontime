@@ -1,248 +1,294 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "../components/Navbar";
 import Input from "../components/Input.js";
 import Loading from "../components/Loading";
-import { obterJson } from "./newforms";
-import { criarSolo, criarSemente, criarColheita, criarCultivo, criarSafra } from "../api/culturasAPi"; 
 import Modal from "../components/Modal";
+import { useFormData } from "../hooks/useFormData";
+import { useFormSubmission } from "../hooks/useFormSubmission";
 
 const CriarCultura = () => {
-  const [cultura, setCultura] = useState({});
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(true);
+  // Estados
+  const [formData, setFormData] = useState({});
   const [activeTab, setActiveTab] = useState("solo");
-  const [modalMessage, setModalMessage] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formsConfig, setFormsConfig] = useState(null); // Inicializando com null ou um objeto vazio
+  const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const jsonData = await obterJson(); // Aguardando a promise ser resolvida
-        console.log('Dados obtidos do formsConfig:', jsonData); // Verificando o retorno
-        setFormsConfig(jsonData); // Atualizando formsConfig com os dados obtidos
-      } catch (error) {
-        console.error("Erro ao obter dados do formulário:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+  // Custom Hooks
+  const { data: formsConfig, isLoading, error } = useFormData();
+  const { submitForm, modalState, closeModal } = useFormSubmission();
 
-  const handleChange = (e) => {
+  // Tabs disponíveis
+  const tabs = [
+    { 
+      id: "solo", 
+      icon: "layer-group", 
+      label: "Solo",
+      color: "from-brown-500 to-amber-700",
+      description: "Cadastre informações sobre o solo"
+    },
+    { 
+      id: "semente", 
+      icon: "seedling", 
+      label: "Semente",
+      color: "from-green-500 to-green-700",
+      description: "Registre dados das sementes"
+    },
+    { 
+      id: "colheita", 
+      icon: "tractor", 
+      label: "Colheita",
+      color: "from-yellow-500 to-yellow-700",
+      description: "Informações sobre a colheita"
+    },
+    { 
+      id: "cultivo", 
+      icon: "leaf", 
+      label: "Cultivo",
+      color: "from-emerald-500 to-emerald-700",
+      description: "Dados do cultivo"
+    },
+    { 
+      id: "safra", 
+      icon: "wheat-awn", 
+      label: "Safra",
+      color: "from-orange-500 to-orange-700",
+      description: "Gestão da safra"
+    }
+  ];
+
+  // Handlers
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setCultura((prevCultura) => ({
-      ...prevCultura,
-      [name]: value,
-    }));
-  };
-  
-  const renderFormFields = (fields) => {
-    return Object.values(fields).map((field) => (
-      <div key={field.id} className="form-group flex flex-col mb-4">
-        <div className="flex items-center">
-          <i className={`${field.icon} text-gray-500 mr-2`}></i>
-          <Input
-            id={field.id}
-            type={field.type}
-            name={field.id}
-            label={field.label}
-            value={cultura[field.id] || ""}
-            onChange={handleChange}
-            error={errors[field.id] ? true : false}
-            options={field.options}
-            mask={field.mask}
-          />
-        </div>
-        {errors[field.id] && (
-          <p className="text-red-500 text-[12px] ml-6">{errors[field.id]}</p>
-        )}
-      </div>
-    ));
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prev => ({ ...prev, [name]: null }));
   };
 
-  const handleTabChange = (tab) => {
-    setActiveTab(tab);
-  };
-
-  const formatDateToISO = (dateStr) => {
-    const [day, month, year] = dateStr.split("/").map(Number);
-    return new Date(Date.UTC(year, month - 1, day)).toISOString();
-  };
-  
-const handleSubmit = async (data, apiFunction) => {
-  // Format dates, convert fields starting with "id" to integers, and convert qtdSacas to number
-  const formattedData = Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [
-      key,
-      // Check if the field is a date and format it
-      typeof value === "string" && value.match(/^\d{2}\/\d{2}\/\d{4}$/)
-        ? formatDateToISO(value)
-        // Check if the key starts with "id" and convert to integer
-        : key.startsWith("id") && typeof value === "string"
-        ? parseInt(value, 10)
-        // Convert qtdSacas to a number
-        : key === "qtdSacas" && typeof value === "string"
-        ? Number(value)
-
-        : key === "peso" && typeof value === "string"
-        ? Number(value)
-
-        : key === "valorEstimado" && typeof value === "string"
-        ? Number(value)
-        : value,
-        
-    ])
-  );
-
-    try {
-      const response = await apiFunction(formattedData);
-      console.log("Resposta da API:", response);
-      const { statusCode, message } = response.data || {};
-  
-      if (statusCode !== 200 && statusCode !== 201) {
-        console.log("Erro no statusCode:", statusCode);
-        setModalMessage({
-          message: message || "Ocorreu um erro ao adicionar a entidade.",
-          entity: "",
-          isError: true,
-        });
-      } else {
-        console.log("Operação bem-sucedida:", response.data);
-        setModalMessage({
-          message: message || "Operação realizada com sucesso.",
-          entity: response.data.nome || "Entidade",
-          isError: false,
-        });
+  const validateForm = (fields) => {
+    const newErrors = {};
+    
+    Object.entries(fields).forEach(([key, field]) => {
+      if (field.required && !formData[key]) {
+        newErrors[key] = `${field.label} é obrigatório`;
       }
-  
-      setIsModalOpen(true);
-    } catch (error) {
-      alert("Erro de rede");
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    const currentFields = formsConfig.dados[activeTab];
+    
+    if (!validateForm(currentFields)) {
+      return;
+    }
+
+    const success = await submitForm(formData, activeTab);
+    if (success) {
+      setFormData({});
+      setErrors({});
     }
   };
-  
-  
-  
 
-  const handleSubmitSolo = () => {
-    const soloData = Object.keys(formsConfig.dados.solo).reduce((acc, key) => {
-      if (key in cultura) {
-        acc[key] = cultura[key];
-      }
-      return acc;
-    }, {});
-    handleSubmit(soloData, criarSolo);
+  // Renderização dos campos do formulário
+  const renderFormFields = (fields) => {
+    // Função auxiliar para obter o ícone padrão baseado no tipo do campo
+    const getDefaultIcon = (fieldType) => {
+      const iconMap = {
+        text: "font",
+        number: "hashtag",
+        date: "calendar",
+        select: "list",
+        email: "envelope",
+        password: "lock",
+        tel: "phone",
+        textarea: "align-left",
+        // Adicione mais mapeamentos conforme necessário
+      };
+      return iconMap[fieldType] || "circle"; // "circle" como fallback
+    };
+
+    return (
+      <div className="space-y-8">
+        {/* Cabeçalho do Formulário */}
+        <div className="border-b border-gray-200 pb-4">
+          <h2 className={`text-2xl font-semibold bg-gradient-to-r ${tabs.find(t => t.id === activeTab)?.color} bg-clip-text text-transparent`}>
+            {tabs.find(t => t.id === activeTab)?.label}
+          </h2>
+          <p className="text-gray-600 mt-1">
+            {tabs.find(t => t.id === activeTab)?.description}
+          </p>
+        </div>
+
+        {/* Campos agrupados por seção */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8">
+          {Object.entries(fields).map(([key, field], index) => (
+            <motion.div
+              key={key}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className="form-group relative"
+            >
+              <div className="flex items-start space-x-3">
+                {/* Container do ícone com tamanho fixo */}
+                <div className="flex-shrink-0 w-10 h-10">
+                  <div className={`
+                    w-full h-full rounded-full flex items-center justify-center
+                    ${activeTab === 'solo' ? 'bg-brown-100' :
+                      activeTab === 'semente' ? 'bg-green-100' :
+                      activeTab === 'colheita' ? 'bg-yellow-100' :
+                      activeTab === 'cultivo' ? 'bg-emerald-100' :
+                      'bg-orange-100'}
+                  `}>
+                    <i className={`fas fa-${field.icon || getDefaultIcon(field.type)} text-lg
+                      ${activeTab === 'solo' ? 'text-brown-500' :
+                        activeTab === 'semente' ? 'text-green-500' :
+                        activeTab === 'colheita' ? 'text-yellow-600' :
+                        activeTab === 'cultivo' ? 'text-emerald-500' :
+                        'text-orange-500'}
+                    `}></i>
+                  </div>
+                </div>
+
+                {/* Container do input */}
+                <div className="flex-1">
+                  <Input
+                    id={key}
+                    type={field.type}
+                    name={key}
+                    label={field.label}
+                    value={formData[key] || ""}
+                    onChange={handleInputChange}
+                    error={errors[key]}
+                    options={field.options}
+                    mask={field.mask}
+                    required={field.required}
+                    placeholder={field.placeholder || `Digite ${field.label.toLowerCase()}`}
+                  />
+                  {errors[key] && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-500 text-sm mt-1"
+                    >
+                      {errors[key]}
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Botões de Ação */}
+        <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+          <motion.button
+            type="button"
+            onClick={() => setFormData({})}
+            className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Limpar
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={handleSubmit}
+            className={`
+              px-6 py-2 rounded-lg text-white font-medium
+              bg-gradient-to-r ${tabs.find(t => t.id === activeTab)?.color}
+              hover:shadow-lg transition-all duration-300
+            `}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Salvar {tabs.find(t => t.id === activeTab)?.label}
+          </motion.button>
+        </div>
+      </div>
+    );
   };
 
-  const handleSubmitSemente = () => {
-    const sementeData = Object.keys(formsConfig.dados.semente).reduce((acc, key) => {
-      if (key in cultura) {
-        acc[key] = cultura[key];
-      }
-      return acc;
-    }, {});
-    handleSubmit(sementeData, criarSemente);
-  };
-
-  const handleSubmitColheita = () => {
-    const colheitaData = Object.keys(formsConfig.dados.colheita).reduce((acc, key) => {
-      if (key in cultura) {
-        acc[key] = cultura[key];
-      }
-      return acc;
-    }, {});
-    handleSubmit(colheitaData, criarColheita);
-  };
-
-  const handleSubmitCultivo = () => {
-    const cultivoData = Object.keys(formsConfig.dados.cultivo).reduce((acc, key) => {
-      if (key in cultura) {
-        acc[key] = cultura[key];
-      }
-      return acc;
-    }, {});
-    handleSubmit(cultivoData, criarCultivo);
-  };
-
-  const handleSubmitSafra = () => {
-    const safraData = Object.keys(formsConfig.dados.safra).reduce((acc, key) => {
-      if (key in cultura) {
-        acc[key] = cultura[key];
-      }
-      return acc;
-    }, {});
-    handleSubmit(safraData, criarSafra);
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
+  if (isLoading) return <Loading />;
+  if (error) return <div>Erro ao carregar dados: {error.message}</div>;
 
   return (
     <>
       <Navbar />
-      <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <div className="w-full max-w-[60%] mb-8">
-          <h1 className="text-4xl font-bold text-center text-green-700 mb-4">Criar Cultura</h1>
-          <div className="flex justify-around mb-6">
-            {["solo", "semente", "colheita", "cultivo", "safra"].map((tab, index) => (
+      <main className="flex flex-col items-center min-h-screen bg-gray-50 p-8">
+        <div className="w-full max-w-7xl mb-8">
+          <div className="text-center mb-8">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative inline-block"
+            >
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                Gestão de Cultura
+              </h1>
+              <div className="mt-2 text-gray-600">
+                <span className="inline-flex items-center gap-2">
+                  <i className="fas fa-seedling text-green-500"></i>
+                  Cadastre e gerencie suas culturas agrícolas
+                </span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Nova estrutura de Tabs */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            {tabs.map((tab) => (
               <motion.button
-                key={tab}
-                onClick={() => handleTabChange(tab)}
-                className={`p-2 w-full relative ${activeTab === tab ? "bg-primary text-white" : "bg-white"} transition-colors duration-300 ${index === 0 ? "rounded-tl-md rounded-bl-md" : index === 4 ? "rounded-tr-md rounded-br-md" : ""}`}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  relative p-4 rounded-lg shadow-sm
+                  transition-all duration-300 ease-in-out
+                  ${activeTab === tab.id 
+                    ? `bg-gradient-to-r ${tab.color} text-white scale-105 shadow-lg` 
+                    : 'bg-white hover:bg-gray-50'
+                  }
+                `}
+                whileHover={{ y: -5 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <i className={`fas fa-${tab === "solo" ? "tree" : tab === "semente" ? "seedling" : tab === "colheita" ? "tractor" : tab === "cultivo" ? "leaf" : "flag"} mr-2`}></i>
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                {activeTab === tab && (
+                <div className="flex flex-col items-center space-y-2">
+                  <i className={`fas fa-${tab.icon} text-2xl`} />
+                  <span className="font-medium">{tab.label}</span>
+                  <span className="text-xs text-center opacity-80">
+                    {tab.description}
+                  </span>
+                </div>
+                {activeTab === tab.id && (
                   <motion.div
-                    layoutId="underline"
-                    className="absolute left-0 right-0 bottom-0 h-1 bg-green-600"
+                    layoutId="activeTab"
+                    className="absolute inset-0 rounded-lg border-2 border-white"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
               </motion.button>
             ))}
           </div>
+
+          {/* Formulário com animação */}
           <motion.div
-            layout
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
+            key={activeTab}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="bg-white rounded-xl shadow-lg p-8"
           >
-            <form className="bg-white p-8 rounded-lg shadow-lg">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {activeTab === "solo" && renderFormFields(formsConfig.dados.solo)}
-                {activeTab === "semente" && renderFormFields(formsConfig.dados.semente)}
-                {activeTab === "colheita" && renderFormFields(formsConfig.dados.colheita)}
-                {activeTab === "cultivo" && renderFormFields(formsConfig.dados.cultivo)}
-                {activeTab === "safra" && renderFormFields(formsConfig.dados.safra)}
-              </div>
-              <div className="flex justify-end mt-4">
-                <button
-                  type="button"
-                  onClick={
-                    activeTab === "solo" ? handleSubmitSolo :
-                    activeTab === "semente" ? handleSubmitSemente :
-                    activeTab === "colheita" ? handleSubmitColheita :
-                    activeTab === "cultivo" ? handleSubmitCultivo :
-                    handleSubmitSafra
-                  }
-                  className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
-                >
-                  Enviar
-                </button>
-              </div>
-            </form>
+            {formsConfig?.dados[activeTab] && 
+              renderFormFields(formsConfig.dados[activeTab])
+            }
           </motion.div>
         </div>
       </main>
-      {isModalOpen && <Modal message={modalMessage.message} onClose={() => setIsModalOpen(false)} />}
+      {modalState && <Modal {...modalState} onClose={closeModal} />}
     </>
   );
 };

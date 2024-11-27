@@ -6,8 +6,14 @@ import Input from "../Input.js";
 import { validateEmail, validatePassword } from "@/app/utils/validate";
 import Loading from "../Loading"; // Importe o componente Loading
 import forms from "./forms.json"; // Importando o forms.json
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import { useRouter } from 'next/navigation';
+
+const MySwal = withReactContent(Swal);
 
 export default function LoginForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -61,15 +67,41 @@ export default function LoginForm() {
     }
 
     if (hasError) {
-      return; // Interrompe o submit se houver erro
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro de validação',
+        text: 'Por favor, preencha todos os campos corretamente.',
+        confirmButtonColor: '#084739'
+      });
+      return;
     }
 
-    setLoading(true); // Ativa o loading
+    setLoading(true);
     try {
       await authLogin(formData.email, formData.password);
       sessionStorage.setItem("email", formData.email);
+      
+      MySwal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: 'Bem-vindo!',
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true,
+      });
+
+      // Redireciona para a próxima tela
+      router.push('/home');
+      
     } catch (error) {
       console.error("Erro durante o login:", error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erro no login',
+        text: 'Email ou senha incorretos. Por favor, tente novamente.',
+        confirmButtonColor: '#084739'
+      });
     } finally {
       setLoading(false);
     }

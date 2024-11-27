@@ -6,6 +6,7 @@ import { usuarioSchema } from "./zod";
 import Swal from "sweetalert2";
 import Loading from "../components/Loading";
 import { buscarUsuarioPorEmail, atualizarUsuario } from "../api/perfilApi";
+import { FaUserCircle } from "react-icons/fa";
 
 const EditarPerfil = () => {
   const [usuario, setUsuario] = useState({
@@ -19,7 +20,6 @@ const EditarPerfil = () => {
     celular: "",
   });
   const [errors, setErrors] = useState({});
-  const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,13 +70,6 @@ const EditarPerfil = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfilePicture(URL.createObjectURL(file));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -89,8 +82,8 @@ const EditarPerfil = () => {
         error.errors.forEach((err) => {
           formErrors[err.path[0]] = err.message;
         });
+        setErrors(formErrors);
       }
-      setErrors(formErrors);
       Swal.fire({
         icon: "error",
         title: "Erro!",
@@ -130,44 +123,12 @@ const EditarPerfil = () => {
             Atualize suas informações de perfil.
           </p>
 
-          <div className="flex flex-col items-center mb-4">
-            <label className="block text-gray-700 mb-2">Foto de Perfil</label>
-            {profilePicture && (
-              <img
-                src={profilePicture}
-                alt="Preview"
-                className="w-32 h-32 rounded-full mb-2 object-cover shadow-lg border border-gray-300"
-              />
-            )}
-            <div className="flex items-center flex-col space-y-4 mb-4">
-              <div className="flex flex-col">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-input"
-                />
-                <label
-                  htmlFor="file-input"
-                  className="border border-gray-300 rounded-lg p-2 bg-white hover:bg-gray-100 transition duration-300 ease-in-out cursor-pointer flex items-center justify-center"
-                >
-                  <span className="text-gray-700">Escolher Arquivo</span>
-                </label>
-                {profilePicture && (
-                  <span className="mt-2 text-gray-500">
-                    {profilePicture.split("/").pop()}
-                  </span>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => setProfilePicture(null)}
-                className="bg-red-500 text-white py-2 px-4 rounded-lg transition duration-300 ease-in-out hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400"
-              >
-                Remover Foto
-              </button>
-            </div>
+          <div className="flex flex-col items-center mb-8">
+            <FaUserCircle className="w-32 h-32 text-gray-400" />
+            <h2 className="text-xl font-semibold text-gray-700 mt-2">
+              {usuario.nomeCompleto}
+            </h2>
+            <p className="text-gray-500">{usuario.email}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

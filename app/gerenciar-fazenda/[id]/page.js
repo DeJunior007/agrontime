@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { fetchFarmDetails, updateFarm } from '@/app/api/gerenciarFazendaApi';
 import Input from '@/app/components/Input.js';
 import Loading from '@/app/components/Loading';
+import { motion } from 'framer-motion';
 
 const FarmDetailPage = () => {
   const [loading, setLoading] = useState(true);
@@ -139,148 +140,134 @@ const FarmDetailPage = () => {
   };
 
   return (
-    <main>
+    <main className="bg-gray-50 min-h-screen">
       <Navbar />
-      <section className="mx-auto p-6 bg-white h-screen flex flex-col items-center justify-start">
-      <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
-        Detalhes da Fazenda</h1>
+      <section className="container mx-auto px-4 py-8">
         {loading ? (
-          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8">
-            <h1 className="text-4xl font-bold text-center text-primary mb-4">
-              Carregando...
-            </h1>
+          <div className="flex justify-center items-center h-64">
             <Loading />
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded shadow-xl w-full max-w-[50vw] grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex items-center">
-              <i className="fas fa-id-card text-gray-500 mr-2"></i>
-              <Input
-                id="nome"
-                type="text"
-                label="Nome"
-                value={fazenda.nome}
-                onChange={handleChange}
-                name="nome"
-                error={errors.nome}
-              />
+          <>
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+                Gerenciar Fazenda
+              </h1>
+              <p className="text-gray-600 mt-2">Atualize os dados da fazenda selecionada</p>
             </div>
-            <div className="flex items-center">
-              <i className="fas fa-id-card text-gray-500 mr-2"></i>
-              <Input
-                id="nirf"
-                type="text"
-                label="NIRF"
-                value={fazenda.nirf}
-                onChange={handleChange}
-                name="nirf"
-                error={errors.nirf}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-chart-area text-gray-500 mr-2"></i>
-              <Input
-                id="areaPropriedade"
-                type="number"
-                label="Área da Propriedade"
-                value={fazenda.areaPropriedade}
-                onChange={handleChange}
-                name="areaPropriedade"
-                error={errors.areaPropriedade}
-              />
-            </div>
-  
-            <div className="col-span-2 font-semibold text-lg">Endereço</div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="cep"
-                type="text"
-                label="CEP"
-                value={fazenda.endereco.cep}
-                onChange={handleChange}
-                name="endereco.cep"
-                error={errors.endereco?.cep}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="rua"
-                type="text"
-                label="Rua"
-                value={fazenda.endereco.rua}
-                onChange={handleChange}
-                name="endereco.rua"
-                error={errors.endereco?.rua}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="numero"
-                type="text"
-                label="Número"
-                value={fazenda.endereco.numero}
-                onChange={handleChange}
-                name="endereco.numero"
-                error={errors.endereco?.numero}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="complemento"
-                type="text"
-                label="Complemento"
-                value={fazenda.endereco.complemento}
-                onChange={handleChange}
-                name="endereco.complemento"
-                error={errors.endereco?.complemento}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="bairro"
-                type="text"
-                label="Bairro"
-                value={fazenda.endereco.bairro}
-                onChange={handleChange}
-                name="endereco.bairro"
-                error={errors.endereco?.bairro}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="cidade"
-                type="text"
-                label="Cidade"
-                value={fazenda.endereco.cidade}
-                onChange={handleChange}
-                name="endereco.cidade"
-                error={errors.endereco?.cidade}
-              />
-            </div>
-            <div className="flex items-center">
-              <i className="fas fa-map-marker-alt text-gray-500 mr-2"></i>
-              <Input
-                id="estado"
-                type="text"
-                label="Estado"
-                value={fazenda.endereco.estado}
-                onChange={handleChange}
-                name="endereco.estado"
-                error={errors.endereco?.estado}
-              />
-            </div>
-            <div className="col-span-2 flex justify-end">
-              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Atualizar
-              </button>
-            </div>
-          </form>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-xl shadow-lg p-8"
+            >
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="form-group relative">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                          <i className="fas fa-home text-lg text-green-600"></i>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          id="nome"
+                          type="text"
+                          label="Nome"
+                          value={fazenda.nome}
+                          onChange={handleChange}
+                          name="nome"
+                          error={errors.nome}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group relative">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                          <i className="fas fa-file-alt text-lg text-green-600"></i>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          id="nirf"
+                          type="text"
+                          label="NIRF"
+                          value={fazenda.nirf}
+                          onChange={handleChange}
+                          name="nirf"
+                          error={errors.nirf}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group relative">
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                          <i className="fas fa-ruler text-lg text-green-600"></i>
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          id="areaPropriedade"
+                          type="number"
+                          label="Área da Propriedade"
+                          value={fazenda.areaPropriedade}
+                          onChange={handleChange}
+                          name="areaPropriedade"
+                          error={errors.areaPropriedade}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2">
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Endereço</h2>
+                  </div>
+
+                  {/* Campos de endereço */}
+                  {['cep', 'rua', 'numero', 'complemento', 'bairro', 'cidade', 'estado'].map((field) => (
+                    <div key={field} className="form-group relative">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 w-10 h-10">
+                          <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                            <i className="fas fa-map-marker-alt text-lg text-green-600"></i>
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <Input
+                            id={field}
+                            type="text"
+                            label={field.charAt(0).toUpperCase() + field.slice(1)}
+                            value={fazenda.endereco[field]}
+                            onChange={handleChange}
+                            name={`endereco.${field}`}
+                            error={errors[`endereco.${field}`]}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                  <motion.button
+                    type="submit"
+                    className="px-6 py-2 rounded-lg text-white font-medium bg-gradient-to-r from-green-600 to-green-800 hover:shadow-lg transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Atualizar Fazenda
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          </>
         )}
       </section>
     </main>

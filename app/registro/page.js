@@ -1,164 +1,263 @@
 "use client";
-
 import React, { useState } from "react";
-import Swal from "sweetalert2";
+import Navbar from "../components/Navbar";
 import { criarUsuario } from "../api/usuariosAPI";
-import Link from "next/link";
-import Input from "../components/Input.js";
-import inputFields from "./forms.json";
-import { validateEmail, validatePassword, validateRequiredField } from '../utils/validate';
+import Swal from "sweetalert2";
 
-const ManterUsuario = () => {
-  const [usuario, setUsuario] = useState({
+const Registro = () => {
+  const [formData, setFormData] = useState({
     nomeCompleto: "",
     documentoFiscal: "",
     email: "",
     senha: "",
     celular: "",
-    genero: "M",
+    genero: "Masculino",
     dataNascimento: "",
   });
 
-  const [errors, setErrors] = useState({});
-
-  const handleChange = (e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-
-    setUsuario((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: value,
-    }));
-
-    setErrors((prev) => ({
-      ...prev,
-      [name]: "",
-    }));
-  };
-
-  const validateUsuario = () => {
-    const errors = {};
-
-    if (!validateRequiredField(usuario.nomeCompleto)) {
-      errors.nomeCompleto = "Nome Completo é obrigatório";
-    }
-    if (!validateRequiredField(usuario.documentoFiscal)) {
-      errors.documentoFiscal = "CPF é obrigatório";
-    }
-    if (!validateEmail(usuario.email)) {
-      errors.email = "E-mail inválido";
-    }
-    if (!validatePassword(usuario.senha)) {
-      errors.senha = "Senha deve ter no mínimo 8 caracteres";
-    }
-    if (!validateRequiredField(usuario.celular)) {
-      errors.celular = "Celular é obrigatório";
-    }
-    if (!validateRequiredField(usuario.genero)) {
-      errors.genero = "Gênero é obrigatório";
-    }
-    if (!validateRequiredField(usuario.dataNascimento)) {
-      errors.dataNascimento = "Data de Nascimento é obrigatória";
-    }
-
-    return errors;
-  };
-
-  const handleBlur = (name) => {
-    const validationErrors = validateUsuario();
-    setErrors((prev) => ({
-      ...prev,
-      [name]: validationErrors[name] || "",
+      [name]: value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const validationErrors = validateUsuario();
-    
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      Swal.fire("Erro de validação", Object.values(validationErrors).join("\n"), "error");
-      return;
-    }
-  
     try {
-      await criarUsuario(usuario);
-      Swal.fire({
-        title: "Sucesso",
-        text: "Usuário cadastrado com sucesso!",
-        icon: "success",
-        showCancelButton: false,
-        confirmButtonColor: "#084739",
-        confirmButtonText: "Ir para Login",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "/";
-        }
-      });
-      setUsuario({
-        nomeCompleto: "",
-        documentoFiscal: "",
-        email: "",
-        senha: "",
-        celular: "",
-        genero: "M",
-        dataNascimento: "",
-      });
+      const response = await criarUsuario(formData);
+      console.log('Resposta da API:', response);
+
+      if (response.data && response.statusCode === 201) {
+        Swal.fire({
+          title: "Sucesso!",
+          text: "Seu cadastro foi realizado com sucesso!",
+          icon: "success",
+          confirmButtonColor: "#28a745",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/";
+          }
+        });
+      }
     } catch (error) {
-      Swal.fire("Erro", "Erro ao cadastrar o usuário", "error");
+      console.error('Erro:', error);
+      Swal.fire({
+        title: "Erro!",
+        text: error.message || "Erro ao cadastrar usuário",
+        icon: "error",
+        confirmButtonColor: "#dc3545",
+      });
     }
   };
 
   return (
-    <section className="flex flex-col items-center min-h-screen p-8">
-      <div className="w-full max-w-4xl mt-10 p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl md:text-3xl font-bold text-center mb-6">
-          Cadastro de Usuário
-        </h1>
-        <p className="text-sm md:text-lg text-gray-700 text-center mb-4">
-          Preencha os campos abaixo para criar uma conta e gerenciar sua fazenda de forma eficiente.
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {inputFields.map((field, index) => (
-              <div key={index} className="form-group flex flex-col">
-                <div className="flex items-center mb-1">
-                  <i className={`${field.icon} text-gray-500 mr-2`}></i>
-                  <Input
-                    id={field.id}
-                    type={field.type}
-                    name={field.name}
-                    label={field.label}
-                    value={usuario[field.name]}
-                    onChange={handleChange}
-                    onBlur={() => handleBlur(field.name)}
-                    error={errors[field.name] ? true : false}
-                    options={field.options}
-                    mask={field.mask}
-                  />
-                </div>
-                {errors[field.name] && (
-                  <p className="text-red-500 text-[12px] ml-6">{errors[field.name]}</p>
-                )}
-              </div>
-            ))}
+    <main className="bg-white min-h-screen">
+      <Navbar />
+      <div className="container mx-auto p-4">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-green-700 text-3xl font-bold mb-2">Criar Conta</h1>
+            <p className="text-gray-600">Preencha os dados para criar sua conta</p>
           </div>
           <button
-            type="submit"
-            className="w-full py-2 mt-4 bg-[#084739] text-white font-semibold rounded-md hover:bg-[#053f33] transition duration-200"
+            onClick={() => window.location.href = "/"}
+            className="flex items-center text-green-600 hover:text-green-700"
           >
-            Cadastrar
+            <i className="fas fa-arrow-left mr-2"></i>
+            Voltar
           </button>
-          <Link href="/">
-            <button className="w-full py-2 mt-4 text-black font-semibold rounded-md hover:bg-[#c9c9c9] transition duration-200">
-              Voltar para Login
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Nome Completo */}
+          <div>
+            <label className="block">
+              Nome Completo
+              <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                <i className="fas fa-user text-green-600"></i>
+              </span>
+              <input
+                type="text"
+                name="nomeCompleto"
+                value={formData.nomeCompleto}
+                onChange={handleInputChange}
+                className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                required
+              />
+            </div>
+          </div>
+
+          {/* CPF/CNPJ e Email */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block">
+                CPF/CNPJ
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-id-card text-green-600"></i>
+                </span>
+                <input
+                  type="text"
+                  name="documentoFiscal"
+                  value={formData.documentoFiscal}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block">
+                E-mail
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-envelope text-green-600"></i>
+                </span>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Senha e Celular */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block">
+                Senha
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-lock text-green-600"></i>
+                </span>
+                <input
+                  type="password"
+                  name="senha"
+                  value={formData.senha}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block">
+                Celular
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-phone text-green-600"></i>
+                </span>
+                <input
+                  type="text"
+                  name="celular"
+                  value={formData.celular}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Gênero e Data de Nascimento */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block">
+                Gênero
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-venus-mars text-green-600"></i>
+                </span>
+                <select
+                  name="genero"
+                  value={formData.genero}
+                  onChange={handleInputChange}
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500 appearance-none bg-white"
+                  required
+                >
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block">
+                Data de Nascimento
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <i className="fas fa-calendar text-green-600"></i>
+                </span>
+                <input
+                  type="text"
+                  name="dataNascimento"
+                  value={formData.dataNascimento}
+                  onChange={handleInputChange}
+                  placeholder="dd/mm/aaaa"
+                  className="w-full pl-10 pr-4 py-2 border rounded focus:outline-none focus:border-green-500"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Botões */}
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={() => window.location.href = "/"}
+              className="text-green-600 px-4 py-2 rounded hover:bg-green-50 flex items-center"
+            >
+              <i className="fas fa-arrow-left mr-2"></i>
+              Voltar
             </button>
-          </Link>
+            <button
+              type="button"
+              onClick={() => setFormData({
+                nomeCompleto: "",
+                documentoFiscal: "",
+                email: "",
+                senha: "",
+                celular: "",
+                genero: "Masculino",
+                dataNascimento: "",
+              })}
+              className="text-gray-600 px-4 py-2 rounded hover:bg-gray-100"
+            >
+              Limpar
+            </button>
+            <button
+              type="submit"
+              className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+            >
+              Criar Conta
+            </button>
+          </div>
         </form>
       </div>
-    </section>
+    </main>
   );
 };
 
-export default ManterUsuario;
+export default Registro;

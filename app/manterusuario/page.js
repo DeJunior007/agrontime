@@ -9,6 +9,7 @@ import formsConfig from "./forms.json";
 import { funcionarioSchema } from "./zod";
 import z from "zod";
 import { obterFazendas } from "../api/gerenciarFazendaApi";
+import { motion } from "framer-motion";
 
 const ManterFuncionario = () => {
   const [funcionario, setFuncionario] = useState({
@@ -112,55 +113,91 @@ const ManterFuncionario = () => {
   return (
     <>
       <Navbar />
-      <main className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <form className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl mb-8 space-y-6">
-          <h1 className="text-4xl font-bold text-center text-green-700 mb-4">
-            Criar Funcionário
-          </h1>
-          <p className="text-gray-600 text-center mt-2">
-            Aqui, você pode criar um novo funcionário para sua fazenda.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {!Array.isArray(fieldsConfig) || !fieldsConfig.length > 0 ? (
-    <div className="flex items-center justify-center w-full h-full col-span-1 md:col-span-2">
-                <Loading />
+      <main className="bg-gray-50 min-h-screen">
+        <section className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
+              Criar Usuário
+            </h1>
+            <p className="text-gray-600 mt-2">Preencha os dados para cadastrar um novo usuário</p>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-xl shadow-lg p-8"
+          >
+            <form className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {fieldsConfig.map((field, index) => (
+                  <motion.div
+                    key={field.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="form-group relative"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10">
+                        <div className="w-full h-full rounded-full bg-green-100 flex items-center justify-center">
+                          <i className={`${field.icon} text-lg text-green-600`}></i>
+                        </div>
+                      </div>
+
+                      <div className="flex-1">
+                        <Input
+                          id={field.id}
+                          type={field.type}
+                          name={field.name}
+                          label={field.label}
+                          value={funcionario[field.name]}
+                          onChange={handleChange}
+                          error={errors[field.name]}
+                          options={field.options}
+                          mask={field.mask}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-            ) : (
-              fieldsConfig.map((field, index) => (
-                <div key={index} className="form-group flex flex-col">
-                  <div className="flex items-center ">
-                    <i className={`${field.icon} text-gray-500 mr-2`}></i>
-                    <Input
-                      id={field.id}
-                      type={field.type}
-                      name={field.name}
-                      label={field.label}
-                      value={funcionario[field.name]}
-                      onChange={handleChange}
-                      error={errors[field.name] ? true : false}
-                      options={field.options}
-                      mask={field.mask}
-                    />
-                  </div>
-                  {errors[field.name] && (
-                    <p className="text-red-500 text-[12px] ml-6">
-                      {errors[field.name]}
-                    </p>
-                  )}
-                </div>
-              ))
-            )}
-          </div>
-          <div className="flex justify-end mt-6 md:col-span-2">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="bg-[#084739] text-white p-3 rounded-md shadow hover:bg-[#055b4c] transition duration-200 font-semibold"
-            >
-              Criar Funcionário
-            </button>
-          </div>
-        </form>
+
+              <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                <motion.button
+                  type="button"
+                  onClick={() => {
+                    setFuncionario({
+                      idFazenda: "",
+                      nomeCompleto: "",
+                      documentoFiscal: "",
+                      email: "",
+                      senha: "",
+                      tipo: "",
+                      celular: "",
+                      genero: "",
+                      dataNascimento: "",
+                    });
+                    setErrors({});
+                  }}
+                  className="px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Limpar
+                </motion.button>
+                <motion.button
+                  type="button"
+                  onClick={handleSubmit}
+                  className="px-6 py-2 rounded-lg text-white font-medium bg-gradient-to-r from-green-600 to-green-800 hover:shadow-lg transition-all duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Criar Usuário
+                </motion.button>
+              </div>
+            </form>
+          </motion.div>
+        </section>
       </main>
     </>
   );
