@@ -62,7 +62,7 @@ const CriarCultura = () => {
     const { name, value } = e.target;
   
   // Verifica se o campo começa com "id" e tenta converter o valor para um número
-  const updatedValue = (name.startsWith("id") || name === "qtdSacas" || name === "valorEstimado") 
+  const updatedValue = (name.startsWith("id") || name === "qtdSacas" || name === "valorEstimado" || name === "peso") 
     ? Number(value) 
     : value;
   setFormData(prev => ({ ...prev, [name]: updatedValue }));
