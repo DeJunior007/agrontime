@@ -60,8 +60,12 @@ const CriarCultura = () => {
   // Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: null }));
+  
+  // Verifica se o campo começa com "id" e tenta converter o valor para um número
+  const updatedValue = name.startsWith("id") ? Number(value) : value;
+
+  setFormData(prev => ({ ...prev, [name]: updatedValue }));
+  setErrors(prev => ({ ...prev, [name]: null }));
   };
 
   const validateForm = (fields) => {
